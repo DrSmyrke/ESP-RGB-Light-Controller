@@ -27,8 +27,7 @@ var app = {
 //-----------------------------------------------------------------------------
 window.onload = function(){
 	printLocation();
-	updateData();
-	openPage( document.location.pathname );
+	updateData( function(){ app.url = undefined; openPage( document.location.pathname ); } );
 };
 
 
@@ -242,8 +241,13 @@ function buildSettingsUI()
 
 		let string2 = document.createElement( 'div' );
 		string2.classList = 'string';
-		string2.innerHTML = '<text>Port ' + port + ' count</text><text><input type="number" min="0" max="999" name="port' + port + 'leds" onchange="changeParam( this );" value="' + data.leds + '" size="3"></text>';
+		string2.innerHTML = '<text>Port ' + port + ' <i>(кол-во)</i></text><text><input type="number" min="0" max="999" name="port' + port + 'leds" onchange="changeParam( this );" value="' + data.leds + '" size="3"></text>';
 		box.appendChild( string2 );
+
+		let string3 = document.createElement( 'div' );
+		string3.classList = 'string';
+		string3.innerHTML = '<text>Port ' + port + ' <i>(яркость)</i></text><text><input type="number" min="0" max="100" name="port' + port + 'bright" onchange="changeParam( this );" value="' + data.br + '" size="3"><i>%</i></text>';
+		box.appendChild( string3 );
 	}
 
 	let srb = document.createElement( 'div' );

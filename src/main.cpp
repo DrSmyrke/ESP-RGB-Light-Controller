@@ -34,6 +34,11 @@ void setup()
 	app.port3_leds							= LENTA3_COUNT;
 	app.port4_leds							= LENTA4_COUNT;
 	app.port5_leds							= LENTA5_COUNT;
+	app.port1_bright						= DEFAULT_BRIGHTNESS;
+	app.port2_bright						= DEFAULT_BRIGHTNESS;
+	app.port3_bright						= DEFAULT_BRIGHTNESS;
+	app.port4_bright						= DEFAULT_BRIGHTNESS;
+	app.port5_bright						= DEFAULT_BRIGHTNESS;
 
 	for( uint8_t i = 0; i < ZONES_AT_PORT; i++ ){
 		app.port1zones[ i ].color			= 0;
@@ -70,26 +75,31 @@ void setup()
 		port1.updateLength( app.port1_leds );
 		port1.begin();
 		lenta_clear( port1 );
+		setBrightnessPrz( port1, app.port1_bright );
 	}
 	if( app.flags.use_port2 ){
 		port2.updateLength( app.port2_leds );
 		port2.begin();
 		lenta_clear( port2 );
+		setBrightnessPrz( port2, app.port2_bright );
 	}
 	if( app.flags.use_port3 ){
 		port3.updateLength( app.port3_leds );
 		port3.begin();
 		lenta_clear( port3 );
+		setBrightnessPrz( port3, app.port3_bright );
 	}
 	if( app.flags.use_port4 ){
 		port4.updateLength( app.port4_leds );
 		port4.begin();
 		lenta_clear( port4 );
+		setBrightnessPrz( port4, app.port4_bright );
 	}
 	if( app.flags.use_port5 ){
 		port5.updateLength( app.port5_leds );
 		port5.begin();
 		lenta_clear( port5 );
+		setBrightnessPrz( port5, app.port5_bright );
 	}
 
 
@@ -177,15 +187,21 @@ void saveSettings(void)
 	ESP_DEBUG( "Save settings\n" );
 
 	uint8_t data[ sizeof( AppData ) + 1 ];
-	data[ 0 ]								= 0;
-	data[ 1 ]								= app.port1_leds;
-	data[ 2 ]								= app.port2_leds;
-	data[ 3 ]								= app.port3_leds;
-	data[ 4 ]								= app.port4_leds;
-	data[ 5 ]								= app.port5_leds;
-	data[ 6 ]								= app.mode;
+	uint8_t offset							= 0;
+	data[ offset++ ]						= 0;
+	data[ offset++ ]						= app.port1_leds;
+	data[ offset++ ]						= app.port2_leds;
+	data[ offset++ ]						= app.port3_leds;
+	data[ offset++ ]						= app.port4_leds;
+	data[ offset++ ]						= app.port5_leds;
+	data[ offset++ ]						= app.port1_bright;
+	data[ offset++ ]						= app.port2_bright;
+	data[ offset++ ]						= app.port3_bright;
+	data[ offset++ ]						= app.port4_bright;
+	data[ offset++ ]						= app.port5_bright;
+	data[ offset++ ]						= app.mode;
 	//zones
-	uint8_t offset							= 7;
+	
 	uint8_t i;
 	for( i = 0; i < ZONES_AT_PORT; i++ ){
 		data[ offset++ ]					= app.port1zones[ i ].color >> 24;
@@ -250,14 +266,19 @@ void loadSettings(void)
 		app.flags.use_port4					= ( CheckBit( data[ 0 ], 3 ) ) ? 1 : 0;
 		app.flags.use_port5					= ( CheckBit( data[ 0 ], 4 ) ) ? 1 : 0;
 		
-		app.port1_leds						= data[ 1 ];
-		app.port2_leds						= data[ 2 ];
-		app.port3_leds						= data[ 3 ];
-		app.port4_leds						= data[ 4 ];
-		app.port5_leds						= data[ 5 ];
-		app.mode							= data[ 6 ];
+		uint8_t offset						= 1;
+		app.port1_leds						= data[ offset++ ];
+		app.port2_leds						= data[ offset++ ];
+		app.port3_leds						= data[ offset++ ];
+		app.port4_leds						= data[ offset++ ];
+		app.port5_leds						= data[ offset++ ];
+		app.port1_bright					= data[ offset++ ];
+		app.port2_bright					= data[ offset++ ];
+		app.port3_bright					= data[ offset++ ];
+		app.port4_bright					= data[ offset++ ];
+		app.port5_bright					= data[ offset++ ];
+		app.mode							= data[ offset++ ];
 		//zones
-		uint8_t offset						= 7;
 		uint8_t i;
 		for( i = 0; i < ZONES_AT_PORT; i++ ){
 			app.port1zones[ i ].color		= ( ( data[ offset++ ] << 24 ) | ( data[ offset++ ] << 16 ) | ( data[ offset++ ] << 8 ) | ( data[ offset++ ] ) );

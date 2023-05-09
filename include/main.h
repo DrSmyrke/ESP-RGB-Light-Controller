@@ -31,6 +31,7 @@
 #define OUT4_PIN												10
 #define WEB_PAGE_BUFF_SIZE										2048
 #define ZONES_AT_PORT											5
+#define DEFAULT_BRIGHTNESS										37
 
 #define setPlus(reg,bit) reg |= (1<<bit)
 #define setZero(reg,bit) reg &= ~(1<<bit)
@@ -65,6 +66,11 @@ struct AppData{
 	uint8_t port3_leds;
 	uint8_t port4_leds;
 	uint8_t port5_leds;
+	uint8_t port1_bright;
+	uint8_t port2_bright;
+	uint8_t port3_bright;
+	uint8_t port4_bright;
+	uint8_t port5_bright;
 	Zone port1zones[ ZONES_AT_PORT ];
 	Zone port2zones[ ZONES_AT_PORT ];
 	Zone port3zones[ ZONES_AT_PORT ];

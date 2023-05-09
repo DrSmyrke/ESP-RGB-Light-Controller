@@ -278,6 +278,7 @@ void getPageHeadler(void)
 	strcat( pageBuff, ",\"ports\": {" );
 		strcat( pageBuff, "\"1\": {\"use\":" ); strcat( pageBuff, utoa( app.flags.use_port1, esp::tmpVal, 10 ) );
 		strcat( pageBuff, ",\"leds\":" ); strcat( pageBuff, utoa( app.port1_leds, esp::tmpVal, 10 ) );
+		strcat( pageBuff, ",\"br\":" ); strcat( pageBuff, utoa( app.port1_bright, esp::tmpVal, 10 ) );
 		strcat( pageBuff, ",\"zones\":[" );
 		for( uint8_t i = 0; i < ZONES_AT_PORT; i++ ){
 			if( i > 0 ) strcat( pageBuff, "," );
@@ -288,6 +289,7 @@ void getPageHeadler(void)
 		strcat( pageBuff, "]}" );
 		strcat( pageBuff, ",\"2\": {\"use\":" ); strcat( pageBuff, utoa( app.flags.use_port2, esp::tmpVal, 10 ) );
 		strcat( pageBuff, ",\"leds\":" ); strcat( pageBuff, utoa( app.port2_leds, esp::tmpVal, 10 ) );
+		strcat( pageBuff, ",\"br\":" ); strcat( pageBuff, utoa( app.port2_bright, esp::tmpVal, 10 ) );
 		strcat( pageBuff, ",\"zones\":[" );
 		for( uint8_t i = 0; i < ZONES_AT_PORT; i++ ){
 			if( i > 0 ) strcat( pageBuff, "," );
@@ -298,6 +300,7 @@ void getPageHeadler(void)
 		strcat( pageBuff, "]}" );
 		strcat( pageBuff, ",\"3\": {\"use\":" ); strcat( pageBuff, utoa( app.flags.use_port3, esp::tmpVal, 10 ) );
 		strcat( pageBuff, ",\"leds\":" ); strcat( pageBuff, utoa( app.port3_leds, esp::tmpVal, 10 ) );
+		strcat( pageBuff, ",\"br\":" ); strcat( pageBuff, utoa( app.port3_bright, esp::tmpVal, 10 ) );
 		strcat( pageBuff, ",\"zones\":[" );
 		for( uint8_t i = 0; i < ZONES_AT_PORT; i++ ){
 			if( i > 0 ) strcat( pageBuff, "," );
@@ -308,6 +311,7 @@ void getPageHeadler(void)
 		strcat( pageBuff, "]}" );
 		strcat( pageBuff, ",\"4\": {\"use\":" ); strcat( pageBuff, utoa( app.flags.use_port4, esp::tmpVal, 10 ) );
 		strcat( pageBuff, ",\"leds\":" ); strcat( pageBuff, utoa( app.port4_leds, esp::tmpVal, 10 ) );
+		strcat( pageBuff, ",\"br\":" ); strcat( pageBuff, utoa( app.port4_bright, esp::tmpVal, 10 ) );
 		strcat( pageBuff, ",\"zones\":[" );
 		for( uint8_t i = 0; i < ZONES_AT_PORT; i++ ){
 			if( i > 0 ) strcat( pageBuff, "," );
@@ -318,6 +322,7 @@ void getPageHeadler(void)
 		strcat( pageBuff, "]}" );
 		strcat( pageBuff, ",\"5\": {\"use\":" ); strcat( pageBuff, utoa( app.flags.use_port5, esp::tmpVal, 10 ) );
 		strcat( pageBuff, ",\"leds\":" ); strcat( pageBuff, utoa( app.port5_leds, esp::tmpVal, 10 ) );
+		strcat( pageBuff, ",\"br\":" ); strcat( pageBuff, utoa( app.port5_bright, esp::tmpVal, 10 ) );
 		strcat( pageBuff, ",\"zones\":[" );
 		for( uint8_t i = 0; i < ZONES_AT_PORT; i++ ){
 			if( i > 0 ) strcat( pageBuff, "," );
@@ -362,6 +367,21 @@ void setPageHeadler(void)
 				app.port4_leds = (uint8_t)value.toInt(); success = true;
 			}else if( param == "port5leds" ){
 				app.port5_leds = (uint8_t)value.toInt(); success = true;
+			}else if( param == "port1bright" ){
+				app.port1_bright = (uint8_t)value.toInt(); success = true;
+				if( app.flags.use_port1 ) setBrightnessPrz( port1, app.port1_bright );
+			}else if( param == "port2bright" ){
+				app.port2_bright = (uint8_t)value.toInt(); success = true;
+				if( app.flags.use_port2 ) setBrightnessPrz( port2, app.port2_bright );
+			}else if( param == "port3bright" ){
+				app.port3_bright = (uint8_t)value.toInt(); success = true;
+				if( app.flags.use_port3 ) setBrightnessPrz( port3, app.port3_bright );
+			}else if( param == "port4bright" ){
+				app.port4_bright = (uint8_t)value.toInt(); success = true;
+				if( app.flags.use_port4 ) setBrightnessPrz( port4, app.port4_bright );
+			}else if( param == "port5bright" ){
+				app.port5_bright = (uint8_t)value.toInt(); success = true;
+				if( app.flags.use_port5 ) setBrightnessPrz( port5, app.port5_bright );
 			}else if( param == "zoneCount" ){
 				uint8_t port = (uint8_t)getValue( value, ':', 0 ).toInt();
 				uint8_t zone = (uint8_t)getValue( value, ':', 1 ).toInt();
