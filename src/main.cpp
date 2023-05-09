@@ -60,6 +60,10 @@ void setup()
 	esp::setVersion( 0, 1, FIRMWARE_REVISION );
 	
 	pinMode( LED_BUILTIN, OUTPUT );
+	pinMode( OUT1_PIN, OUTPUT );
+	pinMode( OUT2_PIN, OUTPUT );
+	pinMode( OUT3_PIN, OUTPUT );
+	pinMode( OUT4_PIN, OUTPUT );
 	
 #ifdef __DEV
 	while( !Serial );
@@ -101,6 +105,8 @@ void setup()
 		lenta_clear( port5 );
 		setBrightnessPrz( port5, app.port5_bright );
 	}
+	
+	resetOuts();
 
 
 	//Инициализация Wi-Fi
@@ -189,6 +195,7 @@ void saveSettings(void)
 	uint8_t data[ sizeof( AppData ) + 1 ];
 	uint8_t offset							= 0;
 	data[ offset++ ]						= 0;
+	data[ offset++ ]						= 0;
 	data[ offset++ ]						= app.port1_leds;
 	data[ offset++ ]						= app.port2_leds;
 	data[ offset++ ]						= app.port3_leds;
@@ -250,6 +257,15 @@ void saveSettings(void)
 	if( app.flags.use_port4 ) setPlus( data[ 0 ], 3 );
 	if( app.flags.use_port5 ) setPlus( data[ 0 ], 4 );
 
+	if( app.flags.use_out1 ) setPlus( data[ 1 ], 0 );
+	if( app.flags.use_out2 ) setPlus( data[ 1 ], 1 );
+	if( app.flags.use_out3 ) setPlus( data[ 1 ], 2 );
+	if( app.flags.use_out4 ) setPlus( data[ 1 ], 3 );
+	if( app.flags.out1_state ) setPlus( data[ 1 ], 4 );
+	if( app.flags.out2_state ) setPlus( data[ 1 ], 5 );
+	if( app.flags.out3_state ) setPlus( data[ 1 ], 6 );
+	if( app.flags.out4_state ) setPlus( data[ 1 ], 7 );
+
 	esp::saveSettings( data, sizeof( data ) );
 }
 
@@ -265,8 +281,17 @@ void loadSettings(void)
 		app.flags.use_port3					= ( CheckBit( data[ 0 ], 2 ) ) ? 1 : 0;
 		app.flags.use_port4					= ( CheckBit( data[ 0 ], 3 ) ) ? 1 : 0;
 		app.flags.use_port5					= ( CheckBit( data[ 0 ], 4 ) ) ? 1 : 0;
+
+		app.flags.use_out1					= ( CheckBit( data[ 1 ], 0 ) ) ? 1 : 0;
+		app.flags.use_out2					= ( CheckBit( data[ 1 ], 1 ) ) ? 1 : 0;
+		app.flags.use_out3					= ( CheckBit( data[ 1 ], 2 ) ) ? 1 : 0;
+		app.flags.use_out4					= ( CheckBit( data[ 1 ], 3 ) ) ? 1 : 0;
+		app.flags.out1_state				= ( CheckBit( data[ 1 ], 4 ) ) ? 1 : 0;
+		app.flags.out2_state				= ( CheckBit( data[ 1 ], 5 ) ) ? 1 : 0;
+		app.flags.out3_state				= ( CheckBit( data[ 1 ], 6 ) ) ? 1 : 0;
+		app.flags.out4_state				= ( CheckBit( data[ 1 ], 7 ) ) ? 1 : 0;
 		
-		uint8_t offset						= 1;
+		uint8_t offset						= 2;
 		app.port1_leds						= data[ offset++ ];
 		app.port2_leds						= data[ offset++ ];
 		app.port3_leds						= data[ offset++ ];

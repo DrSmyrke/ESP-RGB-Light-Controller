@@ -267,15 +267,23 @@ void getPageHeadler(void)
 	strcpy( pageBuff, "{\"mode\": " );
 	strcat( pageBuff, utoa( app.mode, esp::tmpVal, 10 ) );
 
-	// strcat( pageBuff, ",\"zones\":" ); strcat( pageBuff, utoa( ZONES_AT_PORT, esp::tmpVal, 10 ) );
-	// strcat( pageBuff, ",\"zone1leds\":" ); strcat( pageBuff, utoa( app.zone1_leds, esp::tmpVal, 10 ) );
-	// strcat( pageBuff, ",\"zone2leds\":" ); strcat( pageBuff, utoa( app.zone2_leds, esp::tmpVal, 10 ) );
-	// strcat( pageBuff, ",\"zone3leds\":" ); strcat( pageBuff, utoa( app.zone3_leds, esp::tmpVal, 10 ) );
-
 	// strcat( pageBuff, ",\"status2\":" ); strcat( pageBuff, utoa( app.status_2, esp::tmpVal, 10 ) );
 	// strcat( pageBuff, ",\"status3\":" ); strcat( pageBuff, utoa( app.status_3, esp::tmpVal, 10 ) );
 
-	strcat( pageBuff, ",\"ports\": {" );
+	strcat( pageBuff, ",\"outs\": {" );
+		strcat( pageBuff, "\"1\": {\"use\":" ); strcat( pageBuff, utoa( app.flags.use_out1, esp::tmpVal, 10 ) );
+		strcat( pageBuff, ",\"state\":" ); strcat( pageBuff, utoa( app.flags.out1_state, esp::tmpVal, 10 ) );
+		strcat( pageBuff, "}" );
+		strcat( pageBuff, ",\"2\": {\"use\":" ); strcat( pageBuff, utoa( app.flags.use_out2, esp::tmpVal, 10 ) );
+		strcat( pageBuff, ",\"state\":" ); strcat( pageBuff, utoa( app.flags.out2_state, esp::tmpVal, 10 ) );
+		strcat( pageBuff, "}" );
+		strcat( pageBuff, ",\"3\": {\"use\":" ); strcat( pageBuff, utoa( app.flags.use_out3, esp::tmpVal, 10 ) );
+		strcat( pageBuff, ",\"state\":" ); strcat( pageBuff, utoa( app.flags.out3_state, esp::tmpVal, 10 ) );
+		strcat( pageBuff, "}" );
+		strcat( pageBuff, ",\"4\": {\"use\":" ); strcat( pageBuff, utoa( app.flags.use_out4, esp::tmpVal, 10 ) );
+		strcat( pageBuff, ",\"state\":" ); strcat( pageBuff, utoa( app.flags.out4_state, esp::tmpVal, 10 ) );
+		strcat( pageBuff, "}" );
+	strcat( pageBuff, "},\"ports\": {" );
 		strcat( pageBuff, "\"1\": {\"use\":" ); strcat( pageBuff, utoa( app.flags.use_port1, esp::tmpVal, 10 ) );
 		strcat( pageBuff, ",\"leds\":" ); strcat( pageBuff, utoa( app.port1_leds, esp::tmpVal, 10 ) );
 		strcat( pageBuff, ",\"br\":" ); strcat( pageBuff, utoa( app.port1_bright, esp::tmpVal, 10 ) );
@@ -382,6 +390,22 @@ void setPageHeadler(void)
 			}else if( param == "port5bright" ){
 				app.port5_bright = (uint8_t)value.toInt(); success = true;
 				if( app.flags.use_port5 ) setBrightnessPrz( port5, app.port5_bright );
+			}else if( param == "out1use" ){
+				app.flags.use_out1 = ( value.toInt() == 1 ) ? 1 : 0; success = true; resetOuts();
+			}else if( param == "out2use" ){
+				app.flags.use_out2 = ( value.toInt() == 1 ) ? 1 : 0; success = true; resetOuts();
+			}else if( param == "out3use" ){
+				app.flags.use_out3 = ( value.toInt() == 1 ) ? 1 : 0; success = true; resetOuts();
+			}else if( param == "out4use" ){
+				app.flags.use_out4 = ( value.toInt() == 1 ) ? 1 : 0; success = true; resetOuts();
+			}else if( param == "out1state" ){
+				app.flags.out1_state = ( value.toInt() == 1 ) ? 1 : 0; success = true; resetOuts();
+			}else if( param == "out2state" ){
+				app.flags.out2_state = ( value.toInt() == 1 ) ? 1 : 0; success = true; resetOuts();
+			}else if( param == "out3state" ){
+				app.flags.out3_state = ( value.toInt() == 1 ) ? 1 : 0; success = true; resetOuts();
+			}else if( param == "out4state" ){
+				app.flags.out4_state = ( value.toInt() == 1 ) ? 1 : 0; success = true; resetOuts();
 			}else if( param == "zoneCount" ){
 				uint8_t port = (uint8_t)getValue( value, ':', 0 ).toInt();
 				uint8_t zone = (uint8_t)getValue( value, ':', 1 ).toInt();
@@ -480,5 +504,13 @@ String getValue(String data, char separator, int index)
 }
 
 //-----------------------------------------------------------------------------------------
+void resetOuts(void)
+{
+	if( app.flags.use_out1 ) digitalWrite( OUT1_PIN, app.flags.out1_state );
+	if( app.flags.use_out2 ) digitalWrite( OUT2_PIN, app.flags.out2_state );
+	if( app.flags.use_out3 ) digitalWrite( OUT3_PIN, app.flags.out3_state );
+	if( app.flags.use_out4 ) digitalWrite( OUT4_PIN, app.flags.out4_state );
+}
+
 //-----------------------------------------------------------------------------------------
 //-----------------------------------------------------------------------------------------

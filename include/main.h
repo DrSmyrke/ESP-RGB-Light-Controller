@@ -59,6 +59,14 @@ struct AppData{
 		unsigned char use_port3								: 1;
 		unsigned char use_port4								: 1;
 		unsigned char use_port5								: 1;
+		unsigned char use_out1								: 1;
+		unsigned char use_out2								: 1;
+		unsigned char use_out3								: 1;
+		unsigned char use_out4								: 1;
+		unsigned char out1_state							: 1;
+		unsigned char out2_state							: 1;
+		unsigned char out3_state							: 1;
+		unsigned char out4_state							: 1;
 	} flags;
 	uint8_t mode;
 	uint8_t port1_leds;

@@ -7,6 +7,7 @@ var app = {
 	data: {
 		mode: 0,
 		ports: {},
+		outs: {},
 	},
 	modsAvailable: [
 		'Радуга',
@@ -137,8 +138,6 @@ function buildControlUI()
 	};
 	modeString.appendChild( modeBox );
 
-	addAbout( obj );
-
 	
 	//Интерфейсы режимов
 	
@@ -173,13 +172,38 @@ function buildControlUI()
 		
 	}
 
+
+
+	let header = document.createElement( 'div' );
+	header.classList = 'header';
+	header.innerHTML = 'Выходы';
+	obj.appendChild( header );
+
+	let box2 = document.createElement( 'div' );
+	box2.classList = 'block';
+	obj.appendChild( box2 );
+
+	for( let out in app.data.outs ){
+		let data = app.data.outs[ out ];
+		if( !data.hasOwnProperty( 'use' ) ) continue;
+		if( !data.hasOwnProperty( 'state' ) ) continue;
+
+		let checked = ( Number( data.state ) ) ? ' checked' : '';
+		let string = document.createElement( 'div' );
+		string.classList = 'string';
+		string.innerHTML = '<text>Out ' + out + '</text><text><input type="checkbox" name="out' + out + 'state" onchange="changeParam( this );"' + checked + '></text>';
+		box2.appendChild( string );
+	}
+
 	let sb = document.createElement( 'div' );
 	sb.classList = 'button';
 	sb.name = 'action';
 	sb.value = 'save';
 	sb.innerHTML = '<text>Сохранить</text>';
 	sb.onclick = function(){ changeParam( this ); };
-	box.appendChild( sb );
+	obj.appendChild( sb );
+
+	addAbout( obj );
 }
 
 //-----------------------------------------------------------------------------
@@ -250,13 +274,34 @@ function buildSettingsUI()
 		box.appendChild( string3 );
 	}
 
+	let header = document.createElement( 'div' );
+	header.classList = 'header';
+	header.innerHTML = 'Выходы';
+	obj.appendChild( header );
+
+	let box2 = document.createElement( 'div' );
+	box2.classList = 'block';
+	obj.appendChild( box2 );
+
+	for( let out in app.data.outs ){
+		let data = app.data.outs[ out ];
+		if( !data.hasOwnProperty( 'use' ) ) continue;
+		if( !data.hasOwnProperty( 'state' ) ) continue;
+
+		let checked = ( Number( data.use ) ) ? ' checked' : '';
+		let string = document.createElement( 'div' );
+		string.classList = 'string';
+		string.innerHTML = '<text>Out ' + out + '</text><text><input type="checkbox" name="out' + out + 'use" onchange="changeParam( this );"' + checked + '></text>';
+		box2.appendChild( string );
+	}
+
 	let srb = document.createElement( 'div' );
 	srb.classList = 'button';
 	srb.name = 'action';
 	srb.value = 'saveReboot';
 	srb.innerHTML = '<text>Сохранить и перезагрузить</text>';
 	srb.onclick = function(){ changeParam( this ); };
-	box.appendChild( srb );
+	obj.appendChild( srb );
 
 	addAbout( obj );
 }
@@ -385,6 +430,7 @@ function updateData( callback = undefined )
 
 				if( dataObject.hasOwnProperty( 'mode' ) ) app.data.mode = dataObject.mode;
 				if( dataObject.hasOwnProperty( 'ports' ) ) app.data.ports = dataObject.ports;
+				if( dataObject.hasOwnProperty( 'outs' ) ) app.data.outs = dataObject.outs;
 				if( dataObject.hasOwnProperty( 'zones' ) ) app.data.zones.count = dataObject.zones;
 
 				if( callback != undefined ) callback();

@@ -29,6 +29,7 @@ void getPageHeadler(void);
 void setPageHeadler(void);
 void indexPageHeadler(void);
 String getValue(String data, char separator, int index);
+void resetOuts(void);
 
 //-----------------------------------------------------------------------------------------
 
