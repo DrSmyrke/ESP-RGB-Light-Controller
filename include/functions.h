@@ -21,6 +21,7 @@ void setBrightnessPrz(Adafruit_NeoPixel &lenta, const uint8_t percent);
 void setBrightness(Adafruit_NeoPixel &lenta, const uint8_t value);
 void startMode0(void);
 void startMode1(void);
+void startMode2(void);
 void animationStart(void);
 void animationProcess(void);
 void clearAll(void);

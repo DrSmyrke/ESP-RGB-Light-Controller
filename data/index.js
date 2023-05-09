@@ -11,10 +11,11 @@ var app = {
 	modsAvailable: [
 		'Радуга',
 		'Зонирование',
+		'Огонь',
 		'Один цвет',
 		'Мигалка',
-		'Огонь',
 		'Гонки',
+		'',
 		'',
 		'',
 		'',
@@ -161,14 +162,14 @@ function buildControlUI()
 			}
 		}
 	}else if( app.data.mode == 2 ){
-		let box1 = document.createElement( 'div' );
-		box1.classList = 'string';
-		box1.innerHTML = '<text>Верх</text><input type="color" name="allUp" value="#123456" onChange="changeParam( this );">';
-		box.appendChild( box1 );
-		let box2 = document.createElement( 'div' );
-		box2.classList = 'string';
-		box2.innerHTML = '<text>Низ</i></text><input type="color" name="allDown" value="#123456" onChange="changeParam( this );">';
-		box.appendChild( box2 );
+		// let box1 = document.createElement( 'div' );
+		// box1.classList = 'string';
+		// box1.innerHTML = '<text>Верх</text><input type="color" name="allUp" value="#123456" onChange="changeParam( this );">';
+		// box.appendChild( box1 );
+		// let box2 = document.createElement( 'div' );
+		// box2.classList = 'string';
+		// box2.innerHTML = '<text>Низ</i></text><input type="color" name="allDown" value="#123456" onChange="changeParam( this );">';
+		// box.appendChild( box2 );
 	}else if( app.data.mode == 3 ){
 		
 	}

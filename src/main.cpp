@@ -8,13 +8,15 @@ Timer timer0( 0, 1000, timer0Interrupt );
 Timer timer1( 0, 25, timer1Interrupt );
 // CRGB leds1[ LENTA1_COUNT ];
 // CRGB leds2[ LENTA2_COUNT ];
-Adafruit_NeoPixel lenta1( LENTA1_COUNT, LENTA1_PIN, NEO_GRB + NEO_KHZ800 );
-Adafruit_NeoPixel lenta2( LENTA2_COUNT, LENTA2_PIN, NEO_GRB + NEO_KHZ800 );
-Adafruit_NeoPixel lenta3( LENTA3_COUNT, LENTA3_PIN, NEO_GRB + NEO_KHZ800 );
-Adafruit_NeoPixel lenta4( LENTA4_COUNT, LENTA4_PIN, NEO_GRB + NEO_KHZ800 );
-Adafruit_NeoPixel lenta5( LENTA5_COUNT, LENTA5_PIN, NEO_GRB + NEO_KHZ800 );
+Adafruit_NeoPixel port1( LENTA1_COUNT, LENTA1_PIN, NEO_GRB + NEO_KHZ800 );
+Adafruit_NeoPixel port2( LENTA2_COUNT, LENTA2_PIN, NEO_GRB + NEO_KHZ800 );
+Adafruit_NeoPixel port3( LENTA3_COUNT, LENTA3_PIN, NEO_GRB + NEO_KHZ800 );
+Adafruit_NeoPixel port4( LENTA4_COUNT, LENTA4_PIN, NEO_GRB + NEO_KHZ800 );
+Adafruit_NeoPixel port5( LENTA5_COUNT, LENTA5_PIN, NEO_GRB + NEO_KHZ800 );
 char pageBuff[ WEB_PAGE_BUFF_SIZE ];
 Pixel rainbow[ 7 ];
+uint16_t m_animationCounter;
+uint16_t m_animationCounterMax;
 
 //----------- FUNCTIONS--------------------------------------------------------------------
 void setup()
@@ -27,11 +29,11 @@ void setup()
 	app.flags.use_port4						= 0;
 	app.flags.use_port5						= 0;
 	app.mode								= 0;
-	app.lenta1_leds							= LENTA1_COUNT;
-	app.lenta2_leds							= LENTA2_COUNT;
-	app.lenta3_leds							= LENTA3_COUNT;
-	app.lenta4_leds							= LENTA4_COUNT;
-	app.lenta5_leds							= LENTA5_COUNT;
+	app.port1_leds							= LENTA1_COUNT;
+	app.port2_leds							= LENTA2_COUNT;
+	app.port3_leds							= LENTA3_COUNT;
+	app.port4_leds							= LENTA4_COUNT;
+	app.port5_leds							= LENTA5_COUNT;
 
 	for( uint8_t i = 0; i < ZONES_AT_PORT; i++ ){
 		app.port1zones[ i ].color			= 0;
@@ -65,29 +67,29 @@ void setup()
 	// FastLED.addLeds<NEOPIXEL, LENTA1_PIN>( leds1, LENTA1_COUNT );
 
 	if( app.flags.use_port1 ){
-		lenta1.updateLength( app.lenta1_leds );
-		lenta1.begin();
-		lenta_clear( lenta1 );
+		port1.updateLength( app.port1_leds );
+		port1.begin();
+		lenta_clear( port1 );
 	}
 	if( app.flags.use_port2 ){
-		lenta2.updateLength( app.lenta2_leds );
-		lenta2.begin();
-		lenta_clear( lenta2 );
+		port2.updateLength( app.port2_leds );
+		port2.begin();
+		lenta_clear( port2 );
 	}
 	if( app.flags.use_port3 ){
-		lenta3.updateLength( app.lenta3_leds );
-		lenta3.begin();
-		lenta_clear( lenta3 );
+		port3.updateLength( app.port3_leds );
+		port3.begin();
+		lenta_clear( port3 );
 	}
 	if( app.flags.use_port4 ){
-		lenta4.updateLength( app.lenta4_leds );
-		lenta4.begin();
-		lenta_clear( lenta4 );
+		port4.updateLength( app.port4_leds );
+		port4.begin();
+		lenta_clear( port4 );
 	}
 	if( app.flags.use_port5 ){
-		lenta5.updateLength( app.lenta5_leds );
-		lenta5.begin();
-		lenta_clear( lenta5 );
+		port5.updateLength( app.port5_leds );
+		port5.begin();
+		lenta_clear( port5 );
 	}
 
 
@@ -176,11 +178,11 @@ void saveSettings(void)
 
 	uint8_t data[ sizeof( AppData ) + 1 ];
 	data[ 0 ]								= 0;
-	data[ 1 ]								= app.lenta1_leds;
-	data[ 2 ]								= app.lenta2_leds;
-	data[ 3 ]								= app.lenta3_leds;
-	data[ 4 ]								= app.lenta4_leds;
-	data[ 5 ]								= app.lenta5_leds;
+	data[ 1 ]								= app.port1_leds;
+	data[ 2 ]								= app.port2_leds;
+	data[ 3 ]								= app.port3_leds;
+	data[ 4 ]								= app.port4_leds;
+	data[ 5 ]								= app.port5_leds;
 	data[ 6 ]								= app.mode;
 	//zones
 	uint8_t offset							= 7;
@@ -248,11 +250,11 @@ void loadSettings(void)
 		app.flags.use_port4					= ( CheckBit( data[ 0 ], 3 ) ) ? 1 : 0;
 		app.flags.use_port5					= ( CheckBit( data[ 0 ], 4 ) ) ? 1 : 0;
 		
-		app.lenta1_leds						= data[ 1 ];
-		app.lenta2_leds						= data[ 2 ];
-		app.lenta3_leds						= data[ 3 ];
-		app.lenta4_leds						= data[ 4 ];
-		app.lenta5_leds						= data[ 5 ];
+		app.port1_leds						= data[ 1 ];
+		app.port2_leds						= data[ 2 ];
+		app.port3_leds						= data[ 3 ];
+		app.port4_leds						= data[ 4 ];
+		app.port5_leds						= data[ 5 ];
 		app.mode							= data[ 6 ];
 		//zones
 		uint8_t offset						= 7;

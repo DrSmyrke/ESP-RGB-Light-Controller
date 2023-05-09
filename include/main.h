@@ -60,11 +60,11 @@ struct AppData{
 		unsigned char use_port5								: 1;
 	} flags;
 	uint8_t mode;
-	uint8_t lenta1_leds;
-	uint8_t lenta2_leds;
-	uint8_t lenta3_leds;
-	uint8_t lenta4_leds;
-	uint8_t lenta5_leds;
+	uint8_t port1_leds;
+	uint8_t port2_leds;
+	uint8_t port3_leds;
+	uint8_t port4_leds;
+	uint8_t port5_leds;
 	Zone port1zones[ ZONES_AT_PORT ];
 	Zone port2zones[ ZONES_AT_PORT ];
 	Zone port3zones[ ZONES_AT_PORT ];
@@ -76,13 +76,15 @@ struct AppData{
 
 extern AppData app;
 extern ESP8266WebServer webServer;
-extern Adafruit_NeoPixel lenta1;
-extern Adafruit_NeoPixel lenta2;
-extern Adafruit_NeoPixel lenta3;
-extern Adafruit_NeoPixel lenta4;
-extern Adafruit_NeoPixel lenta5;
+extern Adafruit_NeoPixel port1;
+extern Adafruit_NeoPixel port2;
+extern Adafruit_NeoPixel port3;
+extern Adafruit_NeoPixel port4;
+extern Adafruit_NeoPixel port5;
 extern char pageBuff[ WEB_PAGE_BUFF_SIZE ];
 extern Pixel rainbow[ 7 ];
+extern uint16_t m_animationCounter;
+extern uint16_t m_animationCounterMax;
 
 //----------- FUNCTIONS--------------------------------------------------------------------
 void timer0Interrupt(void*);

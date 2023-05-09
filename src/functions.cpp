@@ -48,51 +48,51 @@ void startMode0(void)
 	rainbow[ 6 ]					= { 0xEE, 0x82, 0xEE };
 
 	if( app.flags.use_port1 ){
-		setBrightnessPrz( lenta1, 45 );
+		setBrightnessPrz( port1, 45 );
 		uint8_t ri = 0;
-		for( uint16_t i = 0; i <= lenta1.numPixels(); i++ ){
+		for( uint16_t i = 0; i <= port1.numPixels(); i++ ){
 			if( ri >= 6 ) ri = 0;
-			setLed( lenta1, i, rainbow[ ri ].r, rainbow[ ri ].g, rainbow[ ri ].b, true ); delay( 100 );
+			setLed( port1, i, rainbow[ ri ].r, rainbow[ ri ].g, rainbow[ ri ].b, true ); delay( 100 );
 			ri++;
 		}
 		delay( 250 );
 	}
 	if( app.flags.use_port2 ){
-		setBrightnessPrz( lenta2, 45 );
+		setBrightnessPrz( port2, 45 );
 		uint8_t ri = 0;
-		for( uint16_t i = 0; i <= lenta2.numPixels(); i++ ){
+		for( uint16_t i = 0; i <= port2.numPixels(); i++ ){
 			if( ri >= 6 ) ri = 0;
-			setLed( lenta2, i, rainbow[ ri ].r, rainbow[ ri ].g, rainbow[ ri ].b, true ); delay( 100 );
+			setLed( port2, i, rainbow[ ri ].r, rainbow[ ri ].g, rainbow[ ri ].b, true ); delay( 100 );
 			ri++;
 		}
 		delay( 250 );
 	}
 	if( app.flags.use_port3 ){
-		setBrightnessPrz( lenta3, 45 );
+		setBrightnessPrz( port3, 45 );
 		uint8_t ri = 0;
-		for( uint16_t i = 0; i <= lenta3.numPixels(); i++ ){
+		for( uint16_t i = 0; i <= port3.numPixels(); i++ ){
 			if( ri >= 6 ) ri = 0;
-			setLed( lenta3, i, rainbow[ ri ].r, rainbow[ ri ].g, rainbow[ ri ].b, true ); delay( 100 );
+			setLed( port3, i, rainbow[ ri ].r, rainbow[ ri ].g, rainbow[ ri ].b, true ); delay( 100 );
 			ri++;
 		}
 		delay( 250 );
 	}
 	if( app.flags.use_port4 ){
-		setBrightnessPrz( lenta4, 45 );
+		setBrightnessPrz( port4, 45 );
 		uint8_t ri = 0;
-		for( uint16_t i = 0; i <= lenta4.numPixels(); i++ ){
+		for( uint16_t i = 0; i <= port4.numPixels(); i++ ){
 			if( ri >= 6 ) ri = 0;
-			setLed( lenta4, i, rainbow[ ri ].r, rainbow[ ri ].g, rainbow[ ri ].b, true ); delay( 100 );
+			setLed( port4, i, rainbow[ ri ].r, rainbow[ ri ].g, rainbow[ ri ].b, true ); delay( 100 );
 			ri++;
 		}
 		delay( 250 );
 	}
 	if( app.flags.use_port5 ){
-		setBrightnessPrz( lenta5, 45 );
+		setBrightnessPrz( port5, 45 );
 		uint8_t ri = 0;
-		for( uint16_t i = 0; i <= lenta5.numPixels(); i++ ){
+		for( uint16_t i = 0; i <= port5.numPixels(); i++ ){
 			if( ri >= 6 ) ri = 0;
-			setLed( lenta5, i, rainbow[ ri ].r, rainbow[ ri ].g, rainbow[ ri ].b, true ); delay( 100 );
+			setLed( port5, i, rainbow[ ri ].r, rainbow[ ri ].g, rainbow[ ri ].b, true ); delay( 100 );
 			ri++;
 		}
 		delay( 250 );
@@ -113,10 +113,10 @@ void startMode1(void)
 				uint8_t r = app.port1zones[ i ].color >> 24;
 				uint8_t g = app.port1zones[ i ].color >> 16;
 				uint8_t b = app.port1zones[ i ].color >> 8;
-				setLed( lenta1, led++, r, g, b );
+				setLed( port1, led++, r, g, b );
 			}
 		}
-		lenta1.show();
+		port1.show();
 	}
 	if( app.flags.use_port2 ){
 		uint16_t led = 0;
@@ -127,10 +127,10 @@ void startMode1(void)
 				uint8_t r = app.port2zones[ i ].color >> 24;
 				uint8_t g = app.port2zones[ i ].color >> 16;
 				uint8_t b = app.port2zones[ i ].color >> 8;
-				setLed( lenta2, led++, r, g, b );
+				setLed( port2, led++, r, g, b );
 			}
 		}
-		lenta2.show();
+		port2.show();
 	}
 	if( app.flags.use_port3 ){
 		uint16_t led = 0;
@@ -141,10 +141,10 @@ void startMode1(void)
 				uint8_t r = app.port3zones[ i ].color >> 24;
 				uint8_t g = app.port3zones[ i ].color >> 16;
 				uint8_t b = app.port3zones[ i ].color >> 8;
-				setLed( lenta3, led++, r, g, b );
+				setLed( port3, led++, r, g, b );
 			}
 		}
-		lenta3.show();
+		port3.show();
 	}
 	if( app.flags.use_port4 ){
 		uint16_t led = 0;
@@ -155,10 +155,10 @@ void startMode1(void)
 				uint8_t r = app.port4zones[ i ].color >> 24;
 				uint8_t g = app.port4zones[ i ].color >> 16;
 				uint8_t b = app.port4zones[ i ].color >> 8;
-				setLed( lenta4, led++, r, g, b );
+				setLed( port4, led++, r, g, b );
 			}
 		}
-		lenta4.show();
+		port4.show();
 	}
 	if( app.flags.use_port5 ){
 		uint16_t led = 0;
@@ -169,11 +169,56 @@ void startMode1(void)
 				uint8_t r = app.port5zones[ i ].color >> 24;
 				uint8_t g = app.port5zones[ i ].color >> 16;
 				uint8_t b = app.port5zones[ i ].color >> 8;
-				setLed( lenta5, led++, r, g, b );
+				setLed( port5, led++, r, g, b );
 			}
 		}
-		lenta5.show();
+		port5.show();
 	}
+}
+
+//-----------------------------------------------------------------------------------------
+void startMode2(void)
+{
+	clearAll();
+
+	if( app.flags.use_port1 ){
+		for( uint16_t i = 0; i < app.port1_leds; i++ ){
+			uint8_t g = random( FIRE_GREEN_MIN, 255 );
+			setLed( port1, i, 255, g, 0 );
+		}
+		port1.show();
+	}
+	if( app.flags.use_port2 ){
+		for( uint16_t i = 0; i < app.port2_leds; i++ ){
+			uint8_t g = random( FIRE_GREEN_MIN, 255 );
+			setLed( port2, i, 255, g, 0 );
+		}
+		port2.show();
+	}
+	if( app.flags.use_port3 ){
+		for( uint16_t i = 0; i < app.port3_leds; i++ ){
+			uint8_t g = random( FIRE_GREEN_MIN, 255 );
+			setLed( port3, i, 255, g, 0 );
+		}
+		port3.show();
+	}
+	if( app.flags.use_port4 ){
+		for( uint16_t i = 0; i < app.port4_leds; i++ ){
+			uint8_t g = random( FIRE_GREEN_MIN, 255 );
+			setLed( port4, i, 255, g, 0 );
+		}
+		port4.show();
+	}
+	if( app.flags.use_port5 ){
+		for( uint16_t i = 0; i < app.port5_leds; i++ ){
+			uint8_t g = random( FIRE_GREEN_MIN, 255 );
+			setLed( port5, i, 255, g, 0 );
+		}
+		port5.show();
+	}
+
+	m_animationCounterMax = 4;
+	m_animationCounter = 0;
 }
 
 //-----------------------------------------------------------------------------------------
@@ -189,9 +234,8 @@ void animationStart(void)
 	
 	*/
 	switch( app.mode ){
-		case 1:
-			startMode1();
-		break;
+		case 1:		startMode1();		break;
+		case 2:		startMode2();		break;	//Fire
 		case 0:
 		default:
 			startMode0();
@@ -202,28 +246,19 @@ void animationStart(void)
 //-----------------------------------------------------------------------------------------
 void animationProcess(void)
 {
-	// return;
-	// switch( app.animationNum ){
-	// 	case 1:
-	// 		if( app.animationCounter ){
-
-	// 			app.animationCounter--;
-	// 		}else{
-	// 			app.animationNum = 0;
-	// 			clearAll();
-	// 		}
-	// 	break;
-	// }
+	switch( app.mode ){
+		case 2:		fire();				break;
+	}
 }
 
 //-----------------------------------------------------------------------------------------
 void clearAll(void)
 {
-	if( app.flags.use_port1 ) lenta_clear( lenta1 );
-	if( app.flags.use_port2 ) lenta_clear( lenta2 );
-	if( app.flags.use_port3 ) lenta_clear( lenta3 );
-	if( app.flags.use_port4 ) lenta_clear( lenta4 );
-	if( app.flags.use_port5 ) lenta_clear( lenta5 );
+	if( app.flags.use_port1 ) lenta_clear( port1 );
+	if( app.flags.use_port2 ) lenta_clear( port2 );
+	if( app.flags.use_port3 ) lenta_clear( port3 );
+	if( app.flags.use_port4 ) lenta_clear( port4 );
+	if( app.flags.use_port5 ) lenta_clear( port5 );
 }
 
 //-----------------------------------------------------------------------------------------
@@ -242,7 +277,7 @@ void getPageHeadler(void)
 
 	strcat( pageBuff, ",\"ports\": {" );
 		strcat( pageBuff, "\"1\": {\"use\":" ); strcat( pageBuff, utoa( app.flags.use_port1, esp::tmpVal, 10 ) );
-		strcat( pageBuff, ",\"leds\":" ); strcat( pageBuff, utoa( app.lenta1_leds, esp::tmpVal, 10 ) );
+		strcat( pageBuff, ",\"leds\":" ); strcat( pageBuff, utoa( app.port1_leds, esp::tmpVal, 10 ) );
 		strcat( pageBuff, ",\"zones\":[" );
 		for( uint8_t i = 0; i < ZONES_AT_PORT; i++ ){
 			if( i > 0 ) strcat( pageBuff, "," );
@@ -252,7 +287,7 @@ void getPageHeadler(void)
 		}
 		strcat( pageBuff, "]}" );
 		strcat( pageBuff, ",\"2\": {\"use\":" ); strcat( pageBuff, utoa( app.flags.use_port2, esp::tmpVal, 10 ) );
-		strcat( pageBuff, ",\"leds\":" ); strcat( pageBuff, utoa( app.lenta2_leds, esp::tmpVal, 10 ) );
+		strcat( pageBuff, ",\"leds\":" ); strcat( pageBuff, utoa( app.port2_leds, esp::tmpVal, 10 ) );
 		strcat( pageBuff, ",\"zones\":[" );
 		for( uint8_t i = 0; i < ZONES_AT_PORT; i++ ){
 			if( i > 0 ) strcat( pageBuff, "," );
@@ -262,7 +297,7 @@ void getPageHeadler(void)
 		}
 		strcat( pageBuff, "]}" );
 		strcat( pageBuff, ",\"3\": {\"use\":" ); strcat( pageBuff, utoa( app.flags.use_port3, esp::tmpVal, 10 ) );
-		strcat( pageBuff, ",\"leds\":" ); strcat( pageBuff, utoa( app.lenta3_leds, esp::tmpVal, 10 ) );
+		strcat( pageBuff, ",\"leds\":" ); strcat( pageBuff, utoa( app.port3_leds, esp::tmpVal, 10 ) );
 		strcat( pageBuff, ",\"zones\":[" );
 		for( uint8_t i = 0; i < ZONES_AT_PORT; i++ ){
 			if( i > 0 ) strcat( pageBuff, "," );
@@ -272,7 +307,7 @@ void getPageHeadler(void)
 		}
 		strcat( pageBuff, "]}" );
 		strcat( pageBuff, ",\"4\": {\"use\":" ); strcat( pageBuff, utoa( app.flags.use_port4, esp::tmpVal, 10 ) );
-		strcat( pageBuff, ",\"leds\":" ); strcat( pageBuff, utoa( app.lenta4_leds, esp::tmpVal, 10 ) );
+		strcat( pageBuff, ",\"leds\":" ); strcat( pageBuff, utoa( app.port4_leds, esp::tmpVal, 10 ) );
 		strcat( pageBuff, ",\"zones\":[" );
 		for( uint8_t i = 0; i < ZONES_AT_PORT; i++ ){
 			if( i > 0 ) strcat( pageBuff, "," );
@@ -282,7 +317,7 @@ void getPageHeadler(void)
 		}
 		strcat( pageBuff, "]}" );
 		strcat( pageBuff, ",\"5\": {\"use\":" ); strcat( pageBuff, utoa( app.flags.use_port5, esp::tmpVal, 10 ) );
-		strcat( pageBuff, ",\"leds\":" ); strcat( pageBuff, utoa( app.lenta5_leds, esp::tmpVal, 10 ) );
+		strcat( pageBuff, ",\"leds\":" ); strcat( pageBuff, utoa( app.port5_leds, esp::tmpVal, 10 ) );
 		strcat( pageBuff, ",\"zones\":[" );
 		for( uint8_t i = 0; i < ZONES_AT_PORT; i++ ){
 			if( i > 0 ) strcat( pageBuff, "," );
@@ -318,15 +353,15 @@ void setPageHeadler(void)
 			}else if( param == "port5use" ){
 				app.flags.use_port5 = ( value.toInt() == 1 ) ? 1 : 0; success = true;
 			}else if( param == "port1leds" ){
-				app.lenta1_leds = (uint8_t)value.toInt(); success = true;
+				app.port1_leds = (uint8_t)value.toInt(); success = true;
 			}else if( param == "port2leds" ){
-				app.lenta2_leds = (uint8_t)value.toInt(); success = true;
+				app.port2_leds = (uint8_t)value.toInt(); success = true;
 			}else if( param == "port3leds" ){
-				app.lenta3_leds = (uint8_t)value.toInt(); success = true;
+				app.port3_leds = (uint8_t)value.toInt(); success = true;
 			}else if( param == "port4leds" ){
-				app.lenta4_leds = (uint8_t)value.toInt(); success = true;
+				app.port4_leds = (uint8_t)value.toInt(); success = true;
 			}else if( param == "port5leds" ){
-				app.lenta5_leds = (uint8_t)value.toInt(); success = true;
+				app.port5_leds = (uint8_t)value.toInt(); success = true;
 			}else if( param == "zoneCount" ){
 				uint8_t port = (uint8_t)getValue( value, ':', 0 ).toInt();
 				uint8_t zone = (uint8_t)getValue( value, ':', 1 ).toInt();
