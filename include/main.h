@@ -13,7 +13,7 @@
 #include "effects.h"
 
 //----------- DEFINES ----------------------------------------------------------------------
-#define DEVICE_NAME												"RGB_WS2812_Controller"
+#define DEVICE_NAME												"RGB_Light_Controller"
 #define AP_ADMIN_USERNAME										"admin"
 #define LENTA1_COUNT											8
 #define LENTA2_COUNT											8
