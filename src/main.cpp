@@ -39,6 +39,7 @@ void setup()
 	app.port3_bright						= DEFAULT_BRIGHTNESS;
 	app.port4_bright						= DEFAULT_BRIGHTNESS;
 	app.port5_bright						= DEFAULT_BRIGHTNESS;
+	app.masterColor							= (Color){ 0, 0, 0 };
 
 	for( uint8_t i = 0; i < ZONES_AT_PORT; i++ ){
 		app.port1zones[ i ].color			= 0;
@@ -251,6 +252,10 @@ void saveSettings(void)
 		data[ offset++ ]					= app.port5zones[ i ].count;
 	}
 
+	data[ offset++ ]						= app.masterColor.r;
+	data[ offset++ ]						= app.masterColor.g;
+	data[ offset++ ]						= app.masterColor.b;
+
 	if( app.flags.use_port1 ) setPlus( data[ 0 ], 0 );
 	if( app.flags.use_port2 ) setPlus( data[ 0 ], 1 );
 	if( app.flags.use_port3 ) setPlus( data[ 0 ], 2 );
@@ -325,6 +330,10 @@ void loadSettings(void)
 			app.port5zones[ i ].color		= ( ( data[ offset++ ] << 24 ) | ( data[ offset++ ] << 16 ) | ( data[ offset++ ] << 8 ) | ( data[ offset++ ] ) );
 			app.port5zones[ i ].count		= ( ( data[ offset++ ] << 8 ) | ( data[ offset++ ] ) );
 		}
+
+		app.masterColor.r					= data[ offset++ ];
+		app.masterColor.g					= data[ offset++ ];
+		app.masterColor.b					= data[ offset++ ];
 	}
 
 #ifdef __DEV

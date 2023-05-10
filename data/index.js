@@ -8,6 +8,7 @@ var app = {
 		mode: 0,
 		ports: {},
 		outs: {},
+		masterColor: 0,
 	},
 	modsAvailable: [
 		'Радуга',
@@ -159,17 +160,11 @@ function buildControlUI()
 				box.appendChild( boxColor );
 			}
 		}
-	}else if( app.data.mode == 2 ){
-		// let box1 = document.createElement( 'div' );
-		// box1.classList = 'string';
-		// box1.innerHTML = '<text>Верх</text><input type="color" name="allUp" value="#123456" onChange="changeParam( this );">';
-		// box.appendChild( box1 );
-		// let box2 = document.createElement( 'div' );
-		// box2.classList = 'string';
-		// box2.innerHTML = '<text>Низ</i></text><input type="color" name="allDown" value="#123456" onChange="changeParam( this );">';
-		// box.appendChild( box2 );
 	}else if( app.data.mode == 3 ){
-		
+		let boxColor = document.createElement( 'div' );
+		boxColor.classList = 'string';
+		boxColor.innerHTML = '<text>Общий свет</text><input type="color" name="masterColor" value="#' + rgbToHex( toRgb( app.data.masterColor ) ) + '" onChange="changeParam( this );">';
+		box.appendChild( boxColor );
 	}
 
 
@@ -432,6 +427,7 @@ function updateData( callback = undefined )
 				if( dataObject.hasOwnProperty( 'ports' ) ) app.data.ports = dataObject.ports;
 				if( dataObject.hasOwnProperty( 'outs' ) ) app.data.outs = dataObject.outs;
 				if( dataObject.hasOwnProperty( 'zones' ) ) app.data.zones.count = dataObject.zones;
+				if( dataObject.hasOwnProperty( 'masterColor' ) ) app.data.masterColor = dataObject.masterColor;
 
 				if( callback != undefined ) callback();
 

@@ -222,20 +222,61 @@ void startMode2(void)
 }
 
 //-----------------------------------------------------------------------------------------
+void startMode3(void)
+{
+	clearAll();
+
+	if( app.flags.use_port1 ){
+		for( uint16_t i = 0; i < app.port1_leds; i++ ){
+			setLed( port1, i, app.masterColor.r, app.masterColor.g, app.masterColor.b );
+		}
+		port1.show();
+	}
+	if( app.flags.use_port2 ){
+		for( uint16_t i = 0; i < app.port2_leds; i++ ){
+			setLed( port2, i, app.masterColor.r, app.masterColor.g, app.masterColor.b );
+		}
+		port2.show();
+	}
+	if( app.flags.use_port3 ){
+		for( uint16_t i = 0; i < app.port3_leds; i++ ){
+			setLed( port3, i, app.masterColor.r, app.masterColor.g, app.masterColor.b );
+		}
+		port3.show();
+	}
+	if( app.flags.use_port4 ){
+		for( uint16_t i = 0; i < app.port4_leds; i++ ){
+			setLed( port4, i, app.masterColor.r, app.masterColor.g, app.masterColor.b );
+		}
+		port4.show();
+	}
+	if( app.flags.use_port5 ){
+		for( uint16_t i = 0; i < app.port5_leds; i++ ){
+			setLed( port5, i, app.masterColor.r, app.masterColor.g, app.masterColor.b );
+		}
+		port5.show();
+	}
+}
+
+//-----------------------------------------------------------------------------------------
 void animationStart(void)
 {
 	/*
 		'Радуга',
-		'Разделенщина',
+		'Зонирование',
+		'Огонь',
 		'Один цвет',
 		'Мигалка',
-		'Огонь',
 		'Гонки',
-	
+		'',
+		'',
+		'',
+		'',
 	*/
 	switch( app.mode ){
-		case 1:		startMode1();		break;
+		case 1:		startMode1();		break;	//Rianbow
 		case 2:		startMode2();		break;	//Fire
+		case 3:		startMode3();		break;	//One color
 		case 0:
 		default:
 			startMode0();
@@ -267,7 +308,8 @@ void getPageHeadler(void)
 	strcpy( pageBuff, "{\"mode\": " );
 	strcat( pageBuff, utoa( app.mode, esp::tmpVal, 10 ) );
 
-	// strcat( pageBuff, ",\"status2\":" ); strcat( pageBuff, utoa( app.status_2, esp::tmpVal, 10 ) );
+	uint32_t color = ( ( app.masterColor.r << 24 ) | ( app.masterColor.g << 16 ) | ( app.masterColor.b << 8 ) | 0 );
+	strcat( pageBuff, ",\"masterColor\":" ); strcat( pageBuff, utoa( color, esp::tmpVal, 10 ) );
 	// strcat( pageBuff, ",\"status3\":" ); strcat( pageBuff, utoa( app.status_3, esp::tmpVal, 10 ) );
 
 	strcat( pageBuff, ",\"outs\": {" );
@@ -431,7 +473,6 @@ void setPageHeadler(void)
 				uint8_t zone = (uint8_t)getValue( value, ':', 1 ).toInt();
 				String val = getValue( value, ':', 2 );
 				uint32_t color = (uint32_t)getValue( value, ':', 2 ).toInt();
-				ESP_DEBUG( "Set color: [%s][%u]\n", val.c_str(), color );
 
 				if( zone < ZONES_AT_PORT ){
 					if( port == 1 ){
@@ -448,6 +489,13 @@ void setPageHeadler(void)
 					success = true;
 					animationStart();
 				}
+			}else if( param == "masterColor" ){
+				uint32_t color = (uint32_t)value.toInt();
+				app.masterColor.r = color >> 24;
+				app.masterColor.g = color >> 16;
+				app.masterColor.b = color >> 8;
+				success = true;
+				animationStart();
 			}else if( param == "mode" ){
 				app.mode = (uint8_t)value.toInt();
 				success = true;

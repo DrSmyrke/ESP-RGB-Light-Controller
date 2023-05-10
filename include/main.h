@@ -50,6 +50,14 @@ struct Zone{
 	uint16_t count;
 };
 
+struct Color
+{
+	uint8_t r;
+	uint8_t g;
+	uint8_t b;
+};
+
+
 struct AppData{
 	struct{
 		unsigned char timer0								: 1;
@@ -84,6 +92,7 @@ struct AppData{
 	Zone port3zones[ ZONES_AT_PORT ];
 	Zone port4zones[ ZONES_AT_PORT ];
 	Zone port5zones[ ZONES_AT_PORT ];
+	Color masterColor;
 };
 
 //----------- VARIABLES --------------------------------------------------------------------
