@@ -59,18 +59,19 @@ void setup()
 
 	esp::init();
 	esp::setVersion( 0, 1, FIRMWARE_REVISION );
+
+#ifdef __DEV
+	while( !Serial );
+	Serial.begin( 115200 );
+#endif
+	ESP_DEBUG( "INIT...\n" );
 	
 	pinMode( LED_BUILTIN, OUTPUT );
 	pinMode( OUT1_PIN, OUTPUT );
 	pinMode( OUT2_PIN, OUTPUT );
 	pinMode( OUT3_PIN, OUTPUT );
 	pinMode( OUT4_PIN, OUTPUT );
-	
-#ifdef __DEV
-	while( !Serial );
-	Serial.begin( 115200 );
-#endif
-	ESP_DEBUG( "INIT...\n" );
+
 
 	loadSettings();
 
@@ -122,7 +123,7 @@ void setup()
 	//Инициализация Web сервера
 	esp::pageBuff = pageBuff;
 	esp::addWebServerPages( &webServer, true, true, true );
-	esp::addWebUpdate( &webServer, "" );
+	esp::addWebUpdate( &webServer, DEVICE_NAME );
 	// webServer.on( "/storageReset", [ webServer ](void){
 	// 	if( esp::checkWebAuth( &webServer, SYSTEM_LOGIN, SYSTEM_PASSWORD, ESP_AUTH_REALM, "access denied" ) ){
 	// 		webServer.send ( 200, "text/html", "OK" );
@@ -150,6 +151,7 @@ void loop()
 {
 	ESP.wdtFeed();
 
+	static uint8_t counter = 0;
 	
 	//Условие срабатывания по таймеру0 (1сек.)
 	if( app.flags.timer0 ){
@@ -162,6 +164,10 @@ void loop()
 	//Условие срабатывания по таймеру1 (25мсек.)
 	if( app.flags.timer1 ){
 		app.flags.timer1 = 0;
+
+		if( !esp::isWiFiConnection() ){
+			if( counter++ % 5 ) digitalWrite( LED_BUILTIN, !digitalRead( LED_BUILTIN ) );
+		}
 
 		animationProcess();
 	}

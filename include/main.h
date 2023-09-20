@@ -38,6 +38,10 @@
 #define ibi(reg,bit) reg ^= (1<<bit)
 #define CheckBit(reg,bit) (reg&(1<<bit))
 
+#ifndef FIRMWARE_REVISION
+	#define FIRMWARE_REVISION									0
+#endif
+
 //-----------------------------------------------------------------------------------------
 struct Pixel{
 	uint8_t r;
