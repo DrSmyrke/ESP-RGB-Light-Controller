@@ -81,11 +81,11 @@ struct AppData{
 		unsigned char out4_state							: 1;
 	} flags;
 	uint8_t mode;
-	uint8_t port1_leds;
-	uint8_t port2_leds;
-	uint8_t port3_leds;
-	uint8_t port4_leds;
-	uint8_t port5_leds;
+	uint16_t port1_leds;
+	uint16_t port2_leds;
+	uint16_t port3_leds;
+	uint16_t port4_leds;
+	uint16_t port5_leds;
 	uint8_t port1_bright;
 	uint8_t port2_bright;
 	uint8_t port3_bright;

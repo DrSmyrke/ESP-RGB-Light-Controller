@@ -119,6 +119,14 @@ void setup()
 		dnsServer.addRecord( "*", WiFi.softAPIP() );
 		dnsServer.start( DNS_PORT );
 	}
+	// WiFi.softAPdisconnect( true );
+	// WiFi.mode( WiFiMode_t::WIFI_STA );
+	// WiFi.setAutoReconnect( true );
+	// WiFi.setAutoConnect( false );
+	// WiFi.persistent( false );
+	// WiFi.begin( "UZ", "9186078378" );
+	// WiFi.hostname( DEVICE_NAME );
+	// esp::flags.ap_mode = 0;
 
 	//Инициализация Web сервера
 	esp::pageBuff = pageBuff;
@@ -131,6 +139,7 @@ void setup()
 	// 		ESP.reset();
 	// 	}
 	// } );
+
 	webServer.on( "/", indexPageHeadler );
 	if( !esp::flags.ap_mode ) webServer.onNotFound( indexPageHeadler );
 	webServer.on( "/get", getPageHeadler );
@@ -203,10 +212,15 @@ void saveSettings(void)
 	uint8_t offset							= 0;
 	data[ offset++ ]						= 0;
 	data[ offset++ ]						= 0;
+	data[ offset++ ]						= app.port1_leds >> 8;
 	data[ offset++ ]						= app.port1_leds;
+	data[ offset++ ]						= app.port2_leds >> 8;
 	data[ offset++ ]						= app.port2_leds;
+	data[ offset++ ]						= app.port3_leds >> 8;
 	data[ offset++ ]						= app.port3_leds;
+	data[ offset++ ]						= app.port4_leds >> 8;
 	data[ offset++ ]						= app.port4_leds;
+	data[ offset++ ]						= app.port5_leds >> 8;
 	data[ offset++ ]						= app.port5_leds;
 	data[ offset++ ]						= app.port1_bright;
 	data[ offset++ ]						= app.port2_bright;
@@ -303,11 +317,11 @@ void loadSettings(void)
 		app.flags.out4_state				= ( CheckBit( data[ 1 ], 7 ) ) ? 1 : 0;
 		
 		uint8_t offset						= 2;
-		app.port1_leds						= data[ offset++ ];
-		app.port2_leds						= data[ offset++ ];
-		app.port3_leds						= data[ offset++ ];
-		app.port4_leds						= data[ offset++ ];
-		app.port5_leds						= data[ offset++ ];
+		app.port1_leds						= ( data[ offset++ ] << 8 ) | ( data[ offset++ ] );
+		app.port2_leds						= ( data[ offset++ ] << 8 ) | ( data[ offset++ ] );
+		app.port3_leds						= ( data[ offset++ ] << 8 ) | ( data[ offset++ ] );
+		app.port4_leds						= ( data[ offset++ ] << 8 ) | ( data[ offset++ ] );
+		app.port5_leds						= ( data[ offset++ ] << 8 ) | ( data[ offset++ ] );
 		app.port1_bright					= data[ offset++ ];
 		app.port2_bright					= data[ offset++ ];
 		app.port3_bright					= data[ offset++ ];

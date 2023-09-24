@@ -392,7 +392,9 @@ void setPageHeadler(void)
 
 	bool success = false;
 
+#if defined( CONTROL_LOGIN ) && defined( CONTROL_PASSWORD )
 	if( esp::checkWebAuth( &webServer, "login", "password", ESP_AUTH_REALM, "access denied" ) ){
+#endif
 		if( webServer.hasArg( "param" ) && webServer.hasArg( "value" ) ){
 			const String &param = webServer.arg( "param" );
 			const String &value = webServer.arg( "value" );
@@ -408,15 +410,15 @@ void setPageHeadler(void)
 			}else if( param == "port5use" ){
 				app.flags.use_port5 = ( value.toInt() == 1 ) ? 1 : 0; success = true;
 			}else if( param == "port1leds" ){
-				app.port1_leds = (uint8_t)value.toInt(); success = true;
+				app.port1_leds = (uint16_t)value.toInt(); success = true;
 			}else if( param == "port2leds" ){
-				app.port2_leds = (uint8_t)value.toInt(); success = true;
+				app.port2_leds = (uint16_t)value.toInt(); success = true;
 			}else if( param == "port3leds" ){
-				app.port3_leds = (uint8_t)value.toInt(); success = true;
+				app.port3_leds = (uint16_t)value.toInt(); success = true;
 			}else if( param == "port4leds" ){
-				app.port4_leds = (uint8_t)value.toInt(); success = true;
+				app.port4_leds = (uint16_t)value.toInt(); success = true;
 			}else if( param == "port5leds" ){
-				app.port5_leds = (uint8_t)value.toInt(); success = true;
+				app.port5_leds = (uint16_t)value.toInt(); success = true;
 			}else if( param == "port1bright" ){
 				app.port1_bright = (uint8_t)value.toInt(); success = true;
 				if( app.flags.use_port1 ) setBrightnessPrz( port1, app.port1_bright );
@@ -514,7 +516,9 @@ void setPageHeadler(void)
 				}
 			}
 		}
+#if defined( CONTROL_LOGIN ) && defined( CONTROL_PASSWORD )
 	}
+#endif
 
 
 
