@@ -55,7 +55,7 @@ void startMode0(void)
 			setLed( port1, i, rainbow[ ri ].r, rainbow[ ri ].g, rainbow[ ri ].b, true ); delay( 100 );
 			ri++;
 		}
-		delay( 250 );
+		delay( 150 );
 	}
 	if( app.flags.use_port2 ){
 		setBrightnessPrz( port2, 45 );
@@ -65,7 +65,7 @@ void startMode0(void)
 			setLed( port2, i, rainbow[ ri ].r, rainbow[ ri ].g, rainbow[ ri ].b, true ); delay( 100 );
 			ri++;
 		}
-		delay( 250 );
+		delay( 150 );
 	}
 	if( app.flags.use_port3 ){
 		setBrightnessPrz( port3, 45 );
@@ -75,7 +75,7 @@ void startMode0(void)
 			setLed( port3, i, rainbow[ ri ].r, rainbow[ ri ].g, rainbow[ ri ].b, true ); delay( 100 );
 			ri++;
 		}
-		delay( 250 );
+		delay( 150 );
 	}
 	if( app.flags.use_port4 ){
 		setBrightnessPrz( port4, 45 );
@@ -85,7 +85,7 @@ void startMode0(void)
 			setLed( port4, i, rainbow[ ri ].r, rainbow[ ri ].g, rainbow[ ri ].b, true ); delay( 100 );
 			ri++;
 		}
-		delay( 250 );
+		delay( 150 );
 	}
 	if( app.flags.use_port5 ){
 		setBrightnessPrz( port5, 45 );
@@ -95,7 +95,7 @@ void startMode0(void)
 			setLed( port5, i, rainbow[ ri ].r, rainbow[ ri ].g, rainbow[ ri ].b, true ); delay( 100 );
 			ri++;
 		}
-		delay( 250 );
+		delay( 150 );
 	}
 }
 
