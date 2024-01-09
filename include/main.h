@@ -7,19 +7,22 @@
 #include <esp_functions.h>
 #include <DNS_Server.h>
 #include <timer.h>
-#include <Adafruit_NeoPixel.h>
-// #include <FastLED.h>
+#include <WebSocketsServer.h>
+#include <FastLED.h>
 #include "functions.h"
 #include "effects.h"
 
 //----------- DEFINES ----------------------------------------------------------------------
 #define DEVICE_NAME												"RGB_Light_Controller"
 #define AP_ADMIN_USERNAME										"admin"
-#define LENTA1_COUNT											8
-#define LENTA2_COUNT											8
-#define LENTA3_COUNT											8
-#define LENTA4_COUNT											8
-#define LENTA5_COUNT											8
+#define LENTA_COUNT_MAX											2048
+#define LENTS_COUNT												5
+#define OUTS_COUNT												4
+#define LENTA1_SIZE												8
+#define LENTA2_SIZE												8
+#define LENTA3_SIZE												8
+#define LENTA4_SIZE												8
+#define LENTA5_SIZE												8
 #define LENTA1_PIN												D8
 #define LENTA2_PIN												D7
 #define LENTA3_PIN												D6
@@ -30,8 +33,9 @@
 #define OUT3_PIN												D0
 #define OUT4_PIN												10
 #define WEB_PAGE_BUFF_SIZE										2048
-#define ZONES_AT_PORT											5
+#define ZONES_MAX												50
 #define DEFAULT_BRIGHTNESS										37
+#define MAX_BRIGHTNESS											255
 
 #define setPlus(reg,bit) reg |= (1<<bit)
 #define setZero(reg,bit) reg &= ~(1<<bit)
@@ -43,14 +47,40 @@
 #endif
 
 //-----------------------------------------------------------------------------------------
-struct Pixel{
-	uint8_t r;
-	uint8_t g;
-	uint8_t b;
+// #pragma pack(push,1)
+
+namespace WS{
+	struct Header{
+		uint8_t cmd;
+		uint8_t paramID;
+	};
+
+	struct Packet{
+		Header header;
+		uint8_t* data;
+	};
+	struct Packet_zone{
+		Header header;
+		uint8_t zoneNum;
+		uint8_t port;
+		uint8_t start[ 2 ];
+		uint8_t count[ 2 ];
+	};
+	struct Packet_effect{
+		Header header;
+		uint8_t effectID;
+		uint8_t data[ 2 ];
+	};
+	struct Packet_portSize{
+		Header header;
+		uint8_t num;
+		uint8_t data[ 2 ];
+	};
 };
 
 struct Zone{
-	uint32_t color;
+	uint8_t port;
+	uint16_t start;
 	uint16_t count;
 };
 
@@ -66,50 +96,77 @@ struct AppData{
 	struct{
 		unsigned char timer0								: 1;
 		unsigned char timer1								: 1;
-		unsigned char use_port1								: 1;
-		unsigned char use_port2								: 1;
-		unsigned char use_port3								: 1;
-		unsigned char use_port4								: 1;
-		unsigned char use_port5								: 1;
-		unsigned char use_out1								: 1;
-		unsigned char use_out2								: 1;
-		unsigned char use_out3								: 1;
-		unsigned char use_out4								: 1;
-		unsigned char out1_state							: 1;
-		unsigned char out2_state							: 1;
-		unsigned char out3_state							: 1;
-		unsigned char out4_state							: 1;
 	} flags;
-	uint8_t mode;
-	uint16_t port1_leds;
-	uint16_t port2_leds;
-	uint16_t port3_leds;
-	uint16_t port4_leds;
-	uint16_t port5_leds;
-	uint8_t port1_bright;
-	uint8_t port2_bright;
-	uint8_t port3_bright;
-	uint8_t port4_bright;
-	uint8_t port5_bright;
-	Zone port1zones[ ZONES_AT_PORT ];
-	Zone port2zones[ ZONES_AT_PORT ];
-	Zone port3zones[ ZONES_AT_PORT ];
-	Zone port4zones[ ZONES_AT_PORT ];
-	Zone port5zones[ ZONES_AT_PORT ];
-	Color masterColor;
+	
+	CRGB *port1;
+	CRGB *port2;
+	CRGB *port3;
+	CRGB *port4;
+	CRGB *port5;
+
+	struct{
+		uint8_t startByte;
+		uint8_t mode;
+		uint8_t portsMax;
+		uint8_t outsMax;
+		struct{
+			unsigned char port1									: 1;
+			unsigned char port2									: 1;
+			unsigned char port3									: 1;
+			unsigned char port4									: 1;
+			unsigned char port5									: 1;
+			unsigned char port6									: 1;
+			unsigned char port7									: 1;
+			unsigned char port8									: 1;
+			unsigned char out1									: 1;
+			unsigned char out2									: 1;
+			unsigned char out3									: 1;
+			unsigned char out4									: 1;
+			unsigned char out5									: 1;
+			unsigned char out6									: 1;
+			unsigned char out7									: 1;
+			unsigned char out8									: 1;
+		} use;
+		uint16_t port1_size;
+		uint16_t port2_size;
+		uint16_t port3_size;
+		uint16_t port4_size;
+		uint16_t port5_size;
+		uint16_t port6_size;
+		uint16_t port7_size;
+		uint16_t port8_size;
+		struct{
+			unsigned char out1									: 1;
+			unsigned char out2									: 1;
+			unsigned char out3									: 1;
+			unsigned char out4									: 1;
+			unsigned char out5									: 1;
+			unsigned char out6									: 1;
+			unsigned char out7									: 1;
+			unsigned char out8									: 1;
+		} outsState;
+		uint8_t zonesCount;
+		Zone zones[ ZONES_MAX ];
+		struct{
+			uint8_t rainbow_speed;
+			uint8_t rainbow_step;
+			uint8_t fire_speed;
+			uint8_t fire_step;
+			uint8_t pulse_speed;
+			uint8_t pulse_step;
+			Color masterColor;
+		} effects;
+	} param;
 };
+
+// #pragma pack(pop)
 
 //----------- VARIABLES --------------------------------------------------------------------
 
 extern AppData app;
 extern ESP8266WebServer webServer;
-extern Adafruit_NeoPixel port1;
-extern Adafruit_NeoPixel port2;
-extern Adafruit_NeoPixel port3;
-extern Adafruit_NeoPixel port4;
-extern Adafruit_NeoPixel port5;
+extern WebSocketsServer webSocket;
 extern char pageBuff[ WEB_PAGE_BUFF_SIZE ];
-extern Pixel rainbow[ 7 ];
 extern uint16_t m_animationCounter;
 extern uint16_t m_animationCounterMax;
 

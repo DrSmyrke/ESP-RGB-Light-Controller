@@ -3,68 +3,128 @@
 //----------- VARIABLES --------------------------------------------------------------------
 AppData app;
 ESP8266WebServer webServer( 80 );
+WebSocketsServer webSocket( 81 );
 DNS_Server dnsServer;
 Timer timer0( 0, 1000, timer0Interrupt );
-Timer timer1( 0, 25, timer1Interrupt );
-// CRGB leds1[ LENTA1_COUNT ];
+Timer timer1( 0, 10, timer1Interrupt );
+
 // CRGB leds2[ LENTA2_COUNT ];
-Adafruit_NeoPixel port1( LENTA1_COUNT, LENTA1_PIN, NEO_GRB + NEO_KHZ800 );
-Adafruit_NeoPixel port2( LENTA2_COUNT, LENTA2_PIN, NEO_GRB + NEO_KHZ800 );
-Adafruit_NeoPixel port3( LENTA3_COUNT, LENTA3_PIN, NEO_GRB + NEO_KHZ800 );
-Adafruit_NeoPixel port4( LENTA4_COUNT, LENTA4_PIN, NEO_GRB + NEO_KHZ800 );
-Adafruit_NeoPixel port5( LENTA5_COUNT, LENTA5_PIN, NEO_GRB + NEO_KHZ800 );
+// Adafruit_NeoPixel port1( LENTA1_COUNT, LENTA2_PIN, NEO_GRB + NEO_KHZ800 );
+// Adafruit_NeoPixel port2( LENTA2_COUNT, LENTA2_PIN, NEO_GRB + NEO_KHZ800 );
+// Adafruit_NeoPixel port3( LENTA3_COUNT, LENTA3_PIN, NEO_GRB + NEO_KHZ800 );
+// Adafruit_NeoPixel port4( LENTA4_COUNT, LENTA4_PIN, NEO_GRB + NEO_KHZ800 );
+// Adafruit_NeoPixel port5( LENTA5_COUNT, LENTA5_PIN, NEO_GRB + NEO_KHZ800 );
 char pageBuff[ WEB_PAGE_BUFF_SIZE ];
-Pixel rainbow[ 7 ];
+
 uint16_t m_animationCounter;
 uint16_t m_animationCounterMax;
 
 //----------- FUNCTIONS--------------------------------------------------------------------
 void setup()
 {
-	app.flags.timer0						= 0;
-	app.flags.timer1						= 0;
-	app.flags.use_port1						= 0;
-	app.flags.use_port2						= 0;
-	app.flags.use_port3						= 0;
-	app.flags.use_port4						= 0;
-	app.flags.use_port5						= 0;
-	app.mode								= 0;
-	app.port1_leds							= LENTA1_COUNT;
-	app.port2_leds							= LENTA2_COUNT;
-	app.port3_leds							= LENTA3_COUNT;
-	app.port4_leds							= LENTA4_COUNT;
-	app.port5_leds							= LENTA5_COUNT;
-	app.port1_bright						= DEFAULT_BRIGHTNESS;
-	app.port2_bright						= DEFAULT_BRIGHTNESS;
-	app.port3_bright						= DEFAULT_BRIGHTNESS;
-	app.port4_bright						= DEFAULT_BRIGHTNESS;
-	app.port5_bright						= DEFAULT_BRIGHTNESS;
-	app.masterColor							= (Color){ 0, 0, 0 };
-
-	for( uint8_t i = 0; i < ZONES_AT_PORT; i++ ){
-		app.port1zones[ i ].color			= 0;
-		app.port1zones[ i ].count			= 0;
-		app.port2zones[ i ].color			= 0;
-		app.port2zones[ i ].count			= 0;
-		app.port3zones[ i ].color			= 0;
-		app.port3zones[ i ].count			= 0;
-		app.port4zones[ i ].color			= 0;
-		app.port4zones[ i ].count			= 0;
-		app.port5zones[ i ].color			= 0;
-		app.port5zones[ i ].count			= 0;
-	}
-
-
-	ESP.wdtEnable( 10000 );
-
-	esp::init();
-	esp::setVersion( 0, 1, FIRMWARE_REVISION );
-
 #ifdef __DEV
 	while( !Serial );
 	Serial.begin( 115200 );
 #endif
+
+	ESP_DEBUG( "---------------------------------------\n" );
+
+	esp::init();
+	esp::printAllFiles( Serial );
+	esp::setVersion( 0, 1, FIRMWARE_REVISION );
+	
+	ESP_DEBUG( "---------------------------------------\n" );
+	ESP_DEBUG( "BOOTING...\n" );
+
+	app.flags.timer0									= 0;
+	app.flags.timer1									= 0;
+
+	app.port1											= nullptr;
+	app.port2											= nullptr;
+	app.port3											= nullptr;
+	app.port4											= nullptr;
+	app.port5											= nullptr;
+
+	app.param.startByte									= 0xA1;
+	app.param.mode										= 0;
+	app.param.portsMax									= LENTS_COUNT;
+	app.param.outsMax									= OUTS_COUNT;
+	app.param.use.port1									= 0;
+	app.param.use.port2									= 0;
+	app.param.use.port3									= 0;
+	app.param.use.port4									= 0;
+	app.param.use.port5									= 0;
+	app.param.use.port6									= 0;
+	app.param.use.port7									= 0;
+	app.param.use.port8									= 0;
+	app.param.use.out1									= 0;
+	app.param.use.out2									= 0;
+	app.param.use.out3									= 0;
+	app.param.use.out4									= 0;
+	app.param.use.out5									= 0;
+	app.param.use.out6									= 0;
+	app.param.use.out7									= 0;
+	app.param.use.out8									= 0;
+#ifdef LENTA1_SIZE
+	app.param.port1_size								= LENTA1_SIZE;
+#else
+	app.param.port1_size								= 0;
+#endif
+#ifdef LENTA2_SIZE
+	app.param.port2_size								= LENTA2_SIZE;
+#else
+	app.param.port2_size								= 0;
+#endif
+#ifdef LENTA3_SIZE
+	app.param.port3_size								= LENTA3_SIZE;
+#else
+	app.param.port3_size								= 0;
+#endif
+#ifdef LENTA4_SIZE
+	app.param.port4_size								= LENTA4_SIZE;
+#else
+	app.param.port4_size								= 0;
+#endif
+#ifdef LENTA5_SIZE
+	app.param.port5_size								= LENTA5_SIZE;
+#else
+	app.param.port5_size								= 0;
+#endif
+#ifdef LENTA6_SIZE
+	app.param.port6_size								= LENTA6_SIZE;
+#else
+	app.param.port6_size								= 0;
+#endif
+#ifdef LENTA7_SIZE
+	app.param.port7_size								= LENTA7_SIZE;
+#else
+	app.param.port7_size								= 0;
+#endif
+#ifdef LENTA8_SIZE
+	app.param.port8_size								= LENTA8_SIZE;
+#else
+	app.param.port8_size								= 0;
+#endif
+
+	app.param.effects.rainbow_speed						= EFFECT_RAINBOW_SPEED;
+	app.param.effects.rainbow_step						= EFFECT_RAINBOW_STEP;
+	app.param.effects.fire_speed						= EFFECT_FIRE_SPEED;
+	app.param.effects.fire_step							= EFFECT_FIRE_STEP;
+	app.param.effects.pulse_speed						= EFFECT_PULSE_SPEED;
+	app.param.effects.pulse_step						= EFFECT_PULSE_STEP;
+	
+	app.param.effects.masterColor						= { 0, 255, 0 };
+	
+	app.param.zonesCount								= ZONES_MAX;
+	for( uint8_t i = 0; i < ZONES_MAX; i++ ){
+		app.param.zones[ i ].port				= 0;
+		app.param.zones[ i ].count				= 0;
+		app.param.zones[ i ].start				= 0;
+	}
+	
 	ESP_DEBUG( "INIT...\n" );
+
+	ESP.wdtEnable( 10000 );
 	
 	pinMode( LED_BUILTIN, OUTPUT );
 	pinMode( OUT1_PIN, OUTPUT );
@@ -72,53 +132,20 @@ void setup()
 	pinMode( OUT3_PIN, OUTPUT );
 	pinMode( OUT4_PIN, OUTPUT );
 
-
 	loadSettings();
-
-	// FastLED.addLeds<NEOPIXEL, LENTA1_PIN>( leds1, LENTA1_COUNT );
-
-	if( app.flags.use_port1 ){
-		port1.updateLength( app.port1_leds );
-		port1.begin();
-		lenta_clear( port1 );
-		setBrightnessPrz( port1, app.port1_bright );
-	}
-	if( app.flags.use_port2 ){
-		port2.updateLength( app.port2_leds );
-		port2.begin();
-		lenta_clear( port2 );
-		setBrightnessPrz( port2, app.port2_bright );
-	}
-	if( app.flags.use_port3 ){
-		port3.updateLength( app.port3_leds );
-		port3.begin();
-		lenta_clear( port3 );
-		setBrightnessPrz( port3, app.port3_bright );
-	}
-	if( app.flags.use_port4 ){
-		port4.updateLength( app.port4_leds );
-		port4.begin();
-		lenta_clear( port4 );
-		setBrightnessPrz( port4, app.port4_bright );
-	}
-	if( app.flags.use_port5 ){
-		port5.updateLength( app.port5_leds );
-		port5.begin();
-		lenta_clear( port5 );
-		setBrightnessPrz( port5, app.port5_bright );
-	}
-	
-	resetOuts();
-
+	applySettings();
 
 	//Инициализация Wi-Fi
 	IPAddress apIP( 10, 10, 10, 10 );
-	esp::wifi_init( DEVICE_NAME, apIP, apIP, IPAddress( 255, 255, 255, 0 ) );
-	if( esp::flags.ap_mode ){
+	esp::wifi_init( apIP, IPAddress( 0, 0, 0, 0 ), IPAddress( 255, 255, 255, 0 ) );
+	if( esp::getMode() == esp::Mode::AP ){
 		dnsServer.setErrorReplyCode( DNSReplyCode::NoError );
 		dnsServer.addRecord( "*", WiFi.softAPIP() );
 		dnsServer.start( DNS_PORT );
+	}else if( esp::getMode() == esp::Mode::STA ){
+		ESP_DEBUG( "IP: %s\n", WiFi.localIP().toString() );
 	}
+	
 	// WiFi.softAPdisconnect( true );
 	// WiFi.mode( WiFiMode_t::WIFI_STA );
 	// WiFi.setAutoReconnect( true );
@@ -130,7 +157,7 @@ void setup()
 
 	//Инициализация Web сервера
 	esp::pageBuff = pageBuff;
-	esp::addWebServerPages( &webServer, true, true, true );
+	esp::addWebServerPages( &webServer, true, true );
 	esp::addWebUpdate( &webServer, DEVICE_NAME );
 	// webServer.on( "/storageReset", [ webServer ](void){
 	// 	if( esp::checkWebAuth( &webServer, SYSTEM_LOGIN, SYSTEM_PASSWORD, ESP_AUTH_REALM, "access denied" ) ){
@@ -141,17 +168,18 @@ void setup()
 	// } );
 
 	webServer.on( "/", indexPageHeadler );
-	if( !esp::flags.ap_mode ) webServer.onNotFound( indexPageHeadler );
-	webServer.on( "/get", getPageHeadler );
-	webServer.on( "/set", setPageHeadler );
+	webServer.on( USER_SETTINGS_FILE, [](){
+		esp::webSendFile( &webServer, USER_SETTINGS_FILE, "application/octet-stream" );
+	} );
+	if( esp::getMode() != esp::Mode::AP ) webServer.onNotFound( indexPageHeadler );
+	// webServer.on( "/get", getPageHeadler );
+	// webServer.on( "/set", setPageHeadler );
 	webServer.begin();
 
-
-
+	webSocket.begin();
+	webSocket.onEvent( webSocketEvent );
 
 	animationStart();
-	
-
 	ESP_DEBUG( "INIT OK\n" );
 }
 
@@ -175,7 +203,10 @@ void loop()
 		app.flags.timer1 = 0;
 
 		if( !esp::isWiFiConnection() ){
-			if( counter++ % 5 ) digitalWrite( LED_BUILTIN, !digitalRead( LED_BUILTIN ) );
+			if( counter++ >= 10 ){
+				digitalWrite( LED_BUILTIN, !digitalRead( LED_BUILTIN ) );
+				counter = 0;
+			}
 		}
 
 		animationProcess();
@@ -185,8 +216,9 @@ void loop()
 
 
 	webServer.handleClient();
+	webSocket.loop();
 
-	if( esp::flags.ap_mode ){
+	if( esp::getMode() == esp::Mode::AP ){
 		dnsServer.processNextRequest();
 	}
 }
@@ -207,164 +239,21 @@ void timer1Interrupt(void*)
 void saveSettings(void)
 {
 	ESP_DEBUG( "Save settings\n" );
-
-	uint8_t data[ sizeof( AppData ) + 1 ];
-	uint8_t offset							= 0;
-	data[ offset++ ]						= 0;
-	data[ offset++ ]						= 0;
-	data[ offset++ ]						= app.port1_leds >> 8;
-	data[ offset++ ]						= app.port1_leds;
-	data[ offset++ ]						= app.port2_leds >> 8;
-	data[ offset++ ]						= app.port2_leds;
-	data[ offset++ ]						= app.port3_leds >> 8;
-	data[ offset++ ]						= app.port3_leds;
-	data[ offset++ ]						= app.port4_leds >> 8;
-	data[ offset++ ]						= app.port4_leds;
-	data[ offset++ ]						= app.port5_leds >> 8;
-	data[ offset++ ]						= app.port5_leds;
-	data[ offset++ ]						= app.port1_bright;
-	data[ offset++ ]						= app.port2_bright;
-	data[ offset++ ]						= app.port3_bright;
-	data[ offset++ ]						= app.port4_bright;
-	data[ offset++ ]						= app.port5_bright;
-	data[ offset++ ]						= app.mode;
-	//zones
-	
-	uint8_t i;
-	for( i = 0; i < ZONES_AT_PORT; i++ ){
-		data[ offset++ ]					= app.port1zones[ i ].color >> 24;
-		data[ offset++ ]					= app.port1zones[ i ].color >> 16;
-		data[ offset++ ]					= app.port1zones[ i ].color >> 8;
-		data[ offset++ ]					= app.port1zones[ i ].color;
-		data[ offset++ ]					= app.port1zones[ i ].count >> 8;
-		data[ offset++ ]					= app.port1zones[ i ].count;
-	}
-	for( i = 0; i < ZONES_AT_PORT; i++ ){
-		data[ offset++ ]					= app.port2zones[ i ].color >> 24;
-		data[ offset++ ]					= app.port2zones[ i ].color >> 16;
-		data[ offset++ ]					= app.port2zones[ i ].color >> 8;
-		data[ offset++ ]					= app.port2zones[ i ].color;
-		data[ offset++ ]					= app.port2zones[ i ].count >> 8;
-		data[ offset++ ]					= app.port2zones[ i ].count;
-	}
-	for( i = 0; i < ZONES_AT_PORT; i++ ){
-		data[ offset++ ]					= app.port3zones[ i ].color >> 24;
-		data[ offset++ ]					= app.port3zones[ i ].color >> 16;
-		data[ offset++ ]					= app.port3zones[ i ].color >> 8;
-		data[ offset++ ]					= app.port3zones[ i ].color;
-		data[ offset++ ]					= app.port3zones[ i ].count >> 8;
-		data[ offset++ ]					= app.port3zones[ i ].count;
-	}
-	for( i = 0; i < ZONES_AT_PORT; i++ ){
-		data[ offset++ ]					= app.port4zones[ i ].color >> 16;
-		data[ offset++ ]					= app.port4zones[ i ].color >> 24;
-		data[ offset++ ]					= app.port4zones[ i ].color >> 8;
-		data[ offset++ ]					= app.port4zones[ i ].color;
-		data[ offset++ ]					= app.port4zones[ i ].count >> 8;
-		data[ offset++ ]					= app.port4zones[ i ].count;
-	}
-	for( i = 0; i < ZONES_AT_PORT; i++ ){
-		data[ offset++ ]					= app.port5zones[ i ].color >> 24;
-		data[ offset++ ]					= app.port5zones[ i ].color >> 16;
-		data[ offset++ ]					= app.port5zones[ i ].color >> 8;
-		data[ offset++ ]					= app.port5zones[ i ].color;
-		data[ offset++ ]					= app.port5zones[ i ].count >> 8;
-		data[ offset++ ]					= app.port5zones[ i ].count;
-	}
-
-	data[ offset++ ]						= app.masterColor.r;
-	data[ offset++ ]						= app.masterColor.g;
-	data[ offset++ ]						= app.masterColor.b;
-
-	if( app.flags.use_port1 ) setPlus( data[ 0 ], 0 );
-	if( app.flags.use_port2 ) setPlus( data[ 0 ], 1 );
-	if( app.flags.use_port3 ) setPlus( data[ 0 ], 2 );
-	if( app.flags.use_port4 ) setPlus( data[ 0 ], 3 );
-	if( app.flags.use_port5 ) setPlus( data[ 0 ], 4 );
-
-	if( app.flags.use_out1 ) setPlus( data[ 1 ], 0 );
-	if( app.flags.use_out2 ) setPlus( data[ 1 ], 1 );
-	if( app.flags.use_out3 ) setPlus( data[ 1 ], 2 );
-	if( app.flags.use_out4 ) setPlus( data[ 1 ], 3 );
-	if( app.flags.out1_state ) setPlus( data[ 1 ], 4 );
-	if( app.flags.out2_state ) setPlus( data[ 1 ], 5 );
-	if( app.flags.out3_state ) setPlus( data[ 1 ], 6 );
-	if( app.flags.out4_state ) setPlus( data[ 1 ], 7 );
-
-	esp::saveSettings( data, sizeof( data ) );
+	uint8_t* pointer = (uint8_t*)&app.param;
+	esp::saveSettings( pointer, sizeof( app.param ) );
 }
 
 //-----------------------------------------------------------------------------------------
 void loadSettings(void)
 {
 	ESP_DEBUG( "Load settings\n" );
+	uint32_t len = sizeof( app.param );
+	uint8_t* pointer = (uint8_t*)&app.param;
+	esp::loadSettings( pointer, len );
 
-	uint8_t data[ sizeof( AppData ) + 1 ];
-	if( esp::loadSettings( data, sizeof( data ) ) == sizeof( data ) ){
-		app.flags.use_port1					= ( CheckBit( data[ 0 ], 0 ) ) ? 1 : 0;
-		app.flags.use_port2					= ( CheckBit( data[ 0 ], 1 ) ) ? 1 : 0;
-		app.flags.use_port3					= ( CheckBit( data[ 0 ], 2 ) ) ? 1 : 0;
-		app.flags.use_port4					= ( CheckBit( data[ 0 ], 3 ) ) ? 1 : 0;
-		app.flags.use_port5					= ( CheckBit( data[ 0 ], 4 ) ) ? 1 : 0;
-
-		app.flags.use_out1					= ( CheckBit( data[ 1 ], 0 ) ) ? 1 : 0;
-		app.flags.use_out2					= ( CheckBit( data[ 1 ], 1 ) ) ? 1 : 0;
-		app.flags.use_out3					= ( CheckBit( data[ 1 ], 2 ) ) ? 1 : 0;
-		app.flags.use_out4					= ( CheckBit( data[ 1 ], 3 ) ) ? 1 : 0;
-		app.flags.out1_state				= ( CheckBit( data[ 1 ], 4 ) ) ? 1 : 0;
-		app.flags.out2_state				= ( CheckBit( data[ 1 ], 5 ) ) ? 1 : 0;
-		app.flags.out3_state				= ( CheckBit( data[ 1 ], 6 ) ) ? 1 : 0;
-		app.flags.out4_state				= ( CheckBit( data[ 1 ], 7 ) ) ? 1 : 0;
-		
-		uint8_t offset						= 2;
-		app.port1_leds						= ( data[ offset++ ] << 8 ) | ( data[ offset++ ] );
-		app.port2_leds						= ( data[ offset++ ] << 8 ) | ( data[ offset++ ] );
-		app.port3_leds						= ( data[ offset++ ] << 8 ) | ( data[ offset++ ] );
-		app.port4_leds						= ( data[ offset++ ] << 8 ) | ( data[ offset++ ] );
-		app.port5_leds						= ( data[ offset++ ] << 8 ) | ( data[ offset++ ] );
-		app.port1_bright					= data[ offset++ ];
-		app.port2_bright					= data[ offset++ ];
-		app.port3_bright					= data[ offset++ ];
-		app.port4_bright					= data[ offset++ ];
-		app.port5_bright					= data[ offset++ ];
-		app.mode							= data[ offset++ ];
-		//zones
-		uint8_t i;
-		for( i = 0; i < ZONES_AT_PORT; i++ ){
-			app.port1zones[ i ].color		= ( ( data[ offset++ ] << 24 ) | ( data[ offset++ ] << 16 ) | ( data[ offset++ ] << 8 ) | ( data[ offset++ ] ) );
-			app.port1zones[ i ].count		= ( ( data[ offset++ ] << 8 ) | ( data[ offset++ ] ) );
-		}
-		for( i = 0; i < ZONES_AT_PORT; i++ ){
-			app.port2zones[ i ].color		= ( ( data[ offset++ ] << 24 ) | ( data[ offset++ ] << 16 ) | ( data[ offset++ ] << 8 ) | ( data[ offset++ ] ) );
-			app.port2zones[ i ].count		= ( ( data[ offset++ ] << 8 ) | ( data[ offset++ ] ) );
-		}
-		for( i = 0; i < ZONES_AT_PORT; i++ ){
-			app.port3zones[ i ].color		= ( ( data[ offset++ ] << 24 ) | ( data[ offset++ ] << 16 ) | ( data[ offset++ ] << 8 ) | ( data[ offset++ ] ) );
-			app.port3zones[ i ].count		= ( ( data[ offset++ ] << 8 ) | ( data[ offset++ ] ) );
-		}
-		for( i = 0; i < ZONES_AT_PORT; i++ ){
-			app.port4zones[ i ].color		= ( ( data[ offset++ ] << 24 ) | ( data[ offset++ ] << 16 ) | ( data[ offset++ ] << 8 ) | ( data[ offset++ ] ) );
-			app.port4zones[ i ].count		= ( ( data[ offset++ ] << 8 ) | ( data[ offset++ ] ) );
-		}
-		for( i = 0; i < ZONES_AT_PORT; i++ ){
-			app.port5zones[ i ].color		= ( ( data[ offset++ ] << 24 ) | ( data[ offset++ ] << 16 ) | ( data[ offset++ ] << 8 ) | ( data[ offset++ ] ) );
-			app.port5zones[ i ].count		= ( ( data[ offset++ ] << 8 ) | ( data[ offset++ ] ) );
-		}
-
-		app.masterColor.r					= data[ offset++ ];
-		app.masterColor.g					= data[ offset++ ];
-		app.masterColor.b					= data[ offset++ ];
-	}
-
-#ifdef __DEV
-	ESP_DEBUG( "MODE: %d\n", app.mode );
-	if( app.flags.use_port1 ) ESP_DEBUG( "Port 1 [ACTIVATED]\n" );
-	if( app.flags.use_port2 ) ESP_DEBUG( "Port 2 [ACTIVATED]\n" );
-	if( app.flags.use_port3 ) ESP_DEBUG( "Port 3 [ACTIVATED]\n" );
-	if( app.flags.use_port4 ) ESP_DEBUG( "Port 4 [ACTIVATED]\n" );
-	if( app.flags.use_port5 ) ESP_DEBUG( "Port 5 [ACTIVATED]\n" );
-#endif
+	ESP_DEBUG( ">: [%u bytes] ", len );
+	esp::printHexData( pointer, len );
+	ESP_DEBUG( "\n" );
 }
 
-//-----------------------------------------------------------------------------------------
 //-----------------------------------------------------------------------------------------
