@@ -19,29 +19,30 @@ var app = {
 			rainbow_step: 0,
 			fire_speed: 0,
 			fire_step: 0,
+			fire_hue_gap: 0,
+			fire_hue_start: 0,
+			fire_min_bright: 0,
+			fire_max_bright: 0,
+			fire_min_sat: 0,
+			fire_max_sat: 0,
 			pulse_speed: 0,
 			pulse_step: 0,
-			masterColor: { r: 0, g: 0, b:0  },
+			masterColor: { r: 0, g: 0, b:0 },
+			zoneColors: {},
 		},
 	},
-	modsAvailable: [
-		'Импульс',
-		'Радуга',
-		'Огонь',
-		'Один цвет',
-		'Зонирование',
-		// 'Мигалка',
-		// 'Гонки',
-		'',
-		'',
-		'',
-		'',
+	modesAvailable: [
+		{ name: 'Inpulse', ico: '<svg fill="#000000" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="800px" height="800px" viewBox="0 0 470.34 470.34" xml:space="preserve"><g><path d="M235.169,470.34c99.262,0,180.016-80.756,180.016-180.018c0-41.055-28.979-101.928-86.129-180.933 C287.262,51.617,244.866,4.585,244.442,4.117C242.072,1.496,238.705,0,235.17,0c-3.534,0-6.903,1.496-9.273,4.117 c-0.423,0.469-42.819,47.5-84.613,105.272c-57.152,79.004-86.13,139.878-86.13,180.933 C55.152,389.584,135.907,470.34,235.169,470.34z M161.41,124.223c29.423-40.688,59.156-75.953,73.761-92.8 c14.578,16.813,44.227,51.977,73.628,92.621c53.244,73.6,81.387,131.099,81.387,166.278c0,85.477-69.541,155.018-155.017,155.018 c-85.477,0-155.017-69.541-155.017-155.018C80.152,255.173,108.251,197.736,161.41,124.223z"/></g></svg>' },
+		{ name: 'Rainbow', ico: '<svg fill="#000000" width="800px" height="800px" viewBox="0 0 256 256" id="Flat" xmlns="http://www.w3.org/2000/svg"><path d="M184,168v16a8,8,0,0,1-16,0V168a40,40,0,0,0-80,0v16a8,8,0,0,1-16,0V168a56,56,0,0,1,112,0ZM128,80a88.09957,88.09957,0,0,0-88,88v16a8,8,0,0,0,16,0V168a72,72,0,0,1,144,0v16a8,8,0,0,0,16,0V168A88.09957,88.09957,0,0,0,128,80Zm0-32A120.13623,120.13623,0,0,0,8,168v16a8,8,0,0,0,16,0V168a104,104,0,0,1,208,0v16a8,8,0,0,0,16,0V168A120.13623,120.13623,0,0,0,128,48Z"/> </svg>' },
+		{ name: 'Fire', ico: '<svg fill="#000000" width="800px" height="800px" viewBox="0 0 32 32" version="1.1" xmlns="http://www.w3.org/2000/svg"><path d="M15.888 31.977c-7.539 0-12.887-5.228-12.887-12.431 0-3.824 2.293-7.944 2.39-8.116 0.199-0.354 0.59-0.547 0.998-0.502 0.404 0.052 0.736 0.343 0.84 0.736 0.006 0.024 0.624 2.336 1.44 3.62 0.548 0.864 1.104 1.475 1.729 1.899-0.423-1.833-0.747-4.591-0.22-7.421 1.448-7.768 7.562-9.627 7.824-9.701 0.337-0.097 0.695-0.010 0.951 0.223 0.256 0.235 0.373 0.586 0.307 0.927-0.010 0.054-1.020 5.493 1.123 10.127 0.195 0.421 0.466 0.91 0.758 1.399 0.083-0.672 0.212-1.386 0.41-2.080 0.786-2.749 2.819-3.688 2.904-3.726 0.339-0.154 0.735-0.104 1.027 0.126 0.292 0.231 0.433 0.603 0.365 0.969-0.011 0.068-0.294 1.938 1.298 4.592 1.438 2.396 1.852 3.949 1.852 6.928 0 7.203-5.514 12.43-13.111 12.43zM6.115 14.615c-0.549 1.385-1.115 3.226-1.115 4.931 0 6.044 4.506 10.43 10.887 10.43 6.438 0 11.11-4.386 11.11-10.431 0-2.611-0.323-3.822-1.567-5.899-0.832-1.386-1.243-2.633-1.439-3.625-0.198 0.321-0.382 0.712-0.516 1.184-0.61 2.131-0.456 4.623-0.454 4.649 0.029 0.446-0.242 0.859-0.664 1.008s-0.892 0.002-1.151-0.364c-0.075-0.107-1.854-2.624-2.637-4.32-1.628-3.518-1.601-7.323-1.434-9.514-1.648 0.96-4.177 3.104-4.989 7.466-0.791 4.244 0.746 8.488 0.762 8.529 0.133 0.346 0.063 0.739-0.181 1.018-0.245 0.277-0.622 0.4-0.986 0.313-0.124-0.030-2.938-0.762-4.761-3.634-0.325-0.514-0.617-1.137-0.864-1.742z"></path></svg>' },
+		{ name: 'One Color', ico: '<svg width="800px" height="800px" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="a" x1="814.98" x2="881.02" y1="235.19" y2="235.19" gradientTransform="matrix(1.3745 0 0 1.3633 -317.33 -85.443)" gradientUnits="userSpaceOnUse"><stop stop-color="#8a8a8a" offset="0"/><stop stop-color="#f9f9f9" offset="1"/></linearGradient></defs><path d="M878.98 235.19c.012 17.094-13.851 30.957-30.957 30.957s-30.969-13.863-30.957-30.957c-.012-17.094 13.851-30.957 30.957-30.957s30.969 13.863 30.957 30.957z" color="#000000" fill="url(#a)" stroke="#373737" stroke-width="5.6502" transform="matrix(.17626 0 0 .17771 -141.52 -33.795)"/></svg>' },
+		{ name: 'Color Zones', ico: '<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 512 512" xml:space="preserve"><rect x="346.493" y="148.276" transform="matrix(0.7071 0.7071 -0.7071 0.7071 258.7865 -241.3502)" style="fill:#F23488;" width="148.471" height="86.865"/><polygon style="fill:#23CE9E;" points="182.885,80.502 331.346,80.509 331.346,167.439 182.891,167.439 "/><polygon style="fill:#CE246E;" points="337.517,169.929 442.498,274.911 381.08,336.33 331.339,286.59 331.339,254.308 331.346,176.099 "/><polygon style="fill:#1AB281;" points="331.346,176.099 331.339,254.308 261.086,254.308 232.548,225.77 182.885,176.107 182.891,167.439 331.346,167.439 "/><path style="fill:#129665;" d="M331.339,254.308v32.282l0.006,52.327c-2.901-12.006-9.036-23.385-18.407-32.755l-18.972-18.972 l-32.881-32.881L331.339,254.308L331.339,254.308z"/><path style="fill:#AF1A5B;" d="M331.339,286.59l49.741,49.741l-49.741,49.741v-14.335c2.608-10.766,2.614-22.039,0.006-32.819 L331.339,286.59z"/><path style="fill:#E4EAEA;" d="M293.968,287.189l18.972,18.972c9.371,9.371,15.506,20.75,18.407,32.755l-0.006,32.819 c-2.907,11.999-9.036,23.371-18.4,32.735l-5.571,5.571l-1.101,1.101c-27.143,27.143-71.159,27.136-98.303-0.006l-18.972-18.972 L293.968,287.189z"/><polygon style="fill:#AD6102;" points="261.086,254.308 293.968,287.189 188.993,392.164 127.573,330.745 232.548,225.77 "/><polygon style="fill:#D1800D;" points="182.885,176.107 232.548,225.77 127.573,330.745 66.147,269.319 171.122,164.344 "/><rect x="48.534" y="113.561" transform="matrix(0.7071 0.7071 -0.7071 0.7071 159.0308 -8.3528)" style="fill:#EA9B22;" width="82.127" height="148.46"/><circle style="fill:#7A8280;" cx="272.429" cy="373.796" r="19.152"/><path d="M318.649,300.451L176.836,158.638c-0.001-0.001-0.002-0.002-0.003-0.004s-0.002-0.002-0.004-0.003l-58.069-58.069 c-3.154-3.154-8.267-3.154-11.419,0l-30.214,30.214c-3.154,3.154-3.154,8.267,0,11.419c3.154,3.154,8.267,3.154,11.419,0 l24.505-24.504l46.653,46.653l-93.556,93.555l-46.653-46.653l51.046-51.045c3.154-3.154,3.154-8.267,0-11.419 c-3.154-3.155-8.267-3.154-11.419,0L2.365,205.537C0.851,207.051,0,209.105,0,211.247c0,2.141,0.851,4.196,2.365,5.71l199.89,199.89 c14.652,14.652,34.136,22.723,54.86,22.725c0.003,0,0.004,0,0.008,0c20.721,0,40.204-8.069,54.854-22.719l6.673-6.672 c10.088-10.088,17.19-22.725,20.537-36.543c2.903-11.98,2.905-24.643,0.009-36.616C335.855,323.199,328.751,310.553,318.649,300.451 z M171.122,175.764l50.007,50.007l-61.352,61.351c-3.154,3.154-3.154,8.267,0,11.419c1.576,1.576,3.643,2.365,5.71,2.365 s4.133-0.788,5.71-2.365l61.352-61.352l49.999,49.999l-93.556,93.556l-49.999-49.999l12.948-12.948 c3.154-3.154,3.154-8.267,0-11.419c-3.154-3.154-8.267-3.154-11.419,0l-12.948,12.948l-50.007-50.007L171.122,175.764z	M323.491,369.833c-2.649,10.935-8.273,20.937-16.262,28.927l-6.673,6.673c-11.6,11.6-27.025,17.989-43.434,17.989 c-0.001,0-0.004,0-0.006,0c-16.411-0.001-31.839-6.392-43.442-17.995l-13.262-13.262l93.556-93.556l13.262,13.262 c8.001,8.002,13.626,18.009,16.268,28.945C325.794,350.306,325.791,360.339,323.491,369.833z"/><path d="M182.891,155.524c4.46,0,8.075-3.615,8.075-8.075l-0.005-58.871l132.312,0.005l-0.003,70.781H199.557 c-4.46,0-8.075,3.615-8.075,8.075s3.615,8.075,8.075,8.075h123.711l-0.003,70.718H292.21c-4.46,0-8.075,3.615-8.075,8.075 s3.615,8.075,8.075,8.075h31.054l0.001,35.966c0,4.46,3.617,8.075,8.076,8.074c4.46-0.001,8.075-3.617,8.074-8.076l0.003-130.86 c0-0.015,0.002-0.03,0.002-0.045c0-0.015-0.002-0.03-0.002-0.045l0.002-86.885c0-4.46-3.614-8.075-8.075-8.075l-148.462-0.006l0,0 c-2.141,0-4.196,0.851-5.71,2.365c-1.515,1.515-2.365,3.568-2.365,5.711l0.005,66.947 C174.816,151.91,178.432,155.524,182.891,155.524z"/> <path d="M509.635,207.775L404.652,102.793c-1.514-1.515-3.568-2.365-5.71-2.365s-4.196,0.851-5.71,2.365l-48.23,48.23 c-3.154,3.154-3.154,8.267,0,11.419c3.154,3.154,8.267,3.154,11.419,0l42.521-42.521l93.562,93.562l-2.539,2.539 c-3.154,3.154-3.154,8.267,0,11.419c1.576,1.576,3.643,2.365,5.71,2.365s4.133-0.788,5.71-2.365l8.249-8.249 c1.515-1.514,2.365-3.568,2.365-5.71C512,211.342,511.148,209.288,509.635,207.775z"/><path d="M470.203,235.787l-27.704,27.704l-86.632-86.632c-3.154-3.154-8.267-3.154-11.419,0c-3.154,3.154-3.154,8.267,0,11.419 l86.632,86.632l-49.999,49.999l-26.659-26.659c-3.154-3.154-8.267-3.154-11.419,0c-3.154,3.154-3.154,8.267,0,11.419l26.659,26.659 l-24.144,24.144c-3.154,3.154-3.154,8.267,0,11.419c1.576,1.577,3.643,2.365,5.71,2.365s4.133-0.788,5.71-2.365l124.687-124.687 c3.154-3.154,3.154-8.267,0-11.419C478.468,232.634,473.355,232.635,470.203,235.787z"/><path d="M291.679,354.544c-10.615-10.614-27.889-10.615-38.504,0c-5.142,5.142-7.975,11.979-7.975,19.252s2.832,14.11,7.975,19.252 c5.308,5.308,12.279,7.962,19.252,7.962c6.973,0,13.944-2.654,19.252-7.962C302.293,382.432,302.293,365.159,291.679,354.544 C291.679,354.545,291.679,354.545,291.679,354.544z M280.258,381.628c-4.318,4.318-11.346,4.318-15.664,0 c-2.092-2.092-3.244-4.873-3.244-7.832c0-2.959,1.152-5.741,3.244-7.832c2.159-2.16,4.996-3.239,7.832-3.239 c2.837,0,5.674,1.079,7.832,3.239C284.577,370.282,284.577,377.31,280.258,381.628z"/></svg>' },
 	],
 	paramIDs: [
 		'mode', 'u_port', 'u_out', 'out', 'action', 'zone', 'effect', 'port'
 	],
 	effectIDs: [
-		'rainbow_speed', 'rainbow_step', 'fire_speed', 'fire_step', 'pulse_speed', 'pulse_step',
+		'rainbow_speed', 'rainbow_step', 'fire_speed', 'fire_step', 'pulse_speed', 'pulse_step', 'masterColor', 'zoneColor'
 	],
 	ws: undefined,
 	wsAddr: '',
@@ -54,6 +55,8 @@ window.onload = function(){
 	printLocation();
 	buildControlUI();
 	buildSettingsUI();
+	buildModes();
+	updateModes();
 
 	app.localStorage = new Storage( false );
 
@@ -66,6 +69,7 @@ window.onload = function(){
 	wsConnect();
 
 	// updateData( function(){ app.url = undefined; openPage( document.location.pathname ); } );
+	updateMemory();
 };
 
 
@@ -98,7 +102,7 @@ function wsConnect()
 		setConnectionStatus( 'Connected', 'valgreen' );
 		app.reconnectAttempts = 0;
 	};
-	// app.ws.onclose  = this.deinit();
+	// app.ws.onclose = this.deinit();
 	app.ws.onerror = function( event ) {
 		console.error( 'WebSocket error:', event );
 		disconnect();
@@ -170,28 +174,53 @@ function wsOnMessage( event )
 				let start								= ( ( view.getUint8( offset++ ) << 8 ) | ( view.getUint8( offset++ ) ) );
 				let count								= ( ( view.getUint8( offset++ ) << 8 ) | ( view.getUint8( offset++ ) ) );
 				app.data.zones[ i ] = { port: port, start: start, count: count };
+				offset++;
 			}
 
 			// Effects
 			app.data.effects.rainbow_speed				= view.getUint8( offset++ );
 			app.data.effects.rainbow_step				= view.getUint8( offset++ );
+			//rainbow_orders
+			offset += 8 * 2;
+			
 			app.data.effects.fire_speed					= view.getUint8( offset++ );
 			app.data.effects.fire_step					= view.getUint8( offset++ );
+			app.data.effects.fire_hue_gap				= view.getUint8( offset++ );
+			app.data.effects.fire_hue_start				= view.getUint8( offset++ );
+			app.data.effects.fire_min_bright			= view.getUint8( offset++ );
+			app.data.effects.fire_max_bright			= view.getUint8( offset++ );
+			app.data.effects.fire_min_sat				= view.getUint8( offset++ );
+			app.data.effects.fire_max_sat				= view.getUint8( offset++ );
 			app.data.effects.pulse_speed				= view.getUint8( offset++ );
 			app.data.effects.pulse_step					= view.getUint8( offset++ );
+			//pulse_orders
+			offset += 8 * 2;
+
 			app.data.effects.masterColor.r				= view.getUint8( offset++ );
 			app.data.effects.masterColor.g				= view.getUint8( offset++ );
 			app.data.effects.masterColor.b				= view.getUint8( offset++ );
 
+			for( let i = 0; i < app.data.zonesCount; i++ ){
+				app.data.effects.zoneColors[ i ]		= { r: view.getUint8( offset++ ), g: view.getUint8( offset++ ), b: view.getUint8( offset++ ) };
+			}
+
 			rebuildInputsOutsSettings();
 			rebuildZonesSettings();
-			setFieldValue( 'mode', app.data.mode );
+			updateModes();
+
 			setFieldValue( 'rainbow_speed', app.data.effects.rainbow_speed );
 			setFieldValue( 'rainbow_step', app.data.effects.rainbow_step );
 			setFieldValue( 'fire_speed', app.data.effects.fire_speed );
 			setFieldValue( 'fire_step', app.data.effects.fire_step );
+			setFieldValue( 'fire_hue_gap', app.data.effects.fire_hue_gap );
+			setFieldValue( 'fire_hue_start', app.data.effects.fire_hue_start );
+			setFieldValue( 'fire_min_bright', app.data.effects.fire_min_bright );
+			setFieldValue( 'fire_max_bright', app.data.effects.fire_max_bright );
+			setFieldValue( 'fire_min_sat', app.data.effects.fire_min_sat );
+			setFieldValue( 'fire_max_sat', app.data.effects.fire_max_sat );
 			setFieldValue( 'pulse_speed', app.data.effects.pulse_speed );
 			setFieldValue( 'pulse_step', app.data.effects.pulse_step );
+			setFieldValue( 'masterColor', '#' + rgbToHex( app.data.effects.masterColor ) );
 
 			// offset += settings_size;
 
@@ -213,6 +242,15 @@ function wsOnMessage( event )
 			// }else{
 			// 	config = 'not found';
 			// }
+		}else if( command == 0xA2 ){
+			// Device memory status
+			let offset = 1;
+
+			// System state
+			let freeMemory								= ( ( view.getUint8( offset++ ) << 24 ) | ( view.getUint8( offset++ ) << 16 ) | ( view.getUint8( offset++ ) << 8 ) | ( view.getUint8( offset++ ) ) );
+			let totalMemory								= ( ( view.getUint8( offset++ ) << 24 ) | ( view.getUint8( offset++ ) << 16 ) | ( view.getUint8( offset++ ) << 8 ) | ( view.getUint8( offset++ ) ) );
+			let obj										= document.getElementById( 'memoryStatus' );
+			if( obj != undefined ) obj.innerText		= freeMemory + ' / ' + totalMemory;
 		}
 	}else{
 		console.warn( event.data );
@@ -229,25 +267,40 @@ function openPage( url = '' )
 	let title			= '';
 	let cb				= document.getElementById( 'controlBox' );
 	let sb				= document.getElementById( 'settingsBox' );
+	let zb				= document.getElementById( 'zonesBox' );
+	let eb				= document.getElementById( 'effectsBox' );
+
+	if( cb != undefined ) cb.classList.add( 'hidden' );
+	if( sb != undefined ) sb.classList.add( 'hidden' );
+	if( zb != undefined ) zb.classList.add( 'hidden' );
+	if( eb != undefined ) eb.classList.add( 'hidden' );
 
 	switch( url ){
 		case '/control':
-			title = 'Контроль';
+			title = 'Control';
 			if( cb != undefined ) cb.classList.remove( 'hidden' );
-			if( sb != undefined ) sb.classList.add( 'hidden' );
 		break;
 
 		case '/settings':
-			title = 'Настройки';
-			if( cb != undefined ) cb.classList.add( 'hidden' );
+			title = 'Settings';
 			if( sb != undefined ) sb.classList.remove( 'hidden' );
+		break;
+
+		case '/zones':
+			title = 'Zones';
+			if( zb != undefined ) zb.classList.remove( 'hidden' );
+		break;
+
+		case '/effects':
+			title = 'Effects';
+			if( eb != undefined ) eb.classList.remove( 'hidden' );
 		break;
 	}
 
 	app.url = url;
 
 	if( title != '' ){
-		window.history.pushState( {param: 'Value'}, title, url );
+		// window.history.pushState( {param: 'Value'}, title, url );
 		document.title = title;
 	}
 
@@ -262,6 +315,58 @@ function openPage( url = '' )
 				obj.classList.add( 'selected' );
 			}else{
 				obj.classList.remove( 'selected' );
+			}
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
+function buildModes()
+{
+	let obj = document.getElementById( 'modesBox' );
+	if( obj == undefined ) return console.error( 'modesBox is undefined' );
+	obj.innerHTML = '';
+
+	for( let indx in app.modesAvailable ){
+		let mode = app.modesAvailable[ indx ];
+		let button = document.createElement( 'button' );
+		button.lang = indx;
+		button.name = 'mode';
+		button.value = 'mode';
+		button.className = 'button mode flex column';
+		button.innerHTML = mode.ico + '<text>' + mode.name + '</text>';
+		button.onclick = function(){
+			changeParam( this );
+			app.data.mode = this.lang;
+			updateModes();
+		};
+		obj.appendChild( button );
+	}
+}
+
+//-----------------------------------------------------------------------------
+function updateModes()
+{
+	let mb = document.getElementById( 'modesBox' );
+	if( mb != undefined ){
+		for( let i = 0; i < mb.children.length; i++ ){
+			let button = mb.children[ i ];
+			if( button.lang == app.data.mode ){
+				button.classList.add( 'selected' );
+			}else{
+				button.classList.remove( 'selected' );
+			}
+		}
+	}
+
+	let cb = document.getElementById( 'controlBox' );
+	if( cb != undefined ){
+		for( let i = 0; i < cb.lastElementChild.children.length; i++ ){
+			let box = cb.lastElementChild.children[ i ];
+			if( box.lang == app.data.mode ){
+				box.classList.remove( 'hidden' );
+			}else{
+				box.classList.add( 'hidden' );
 			}
 		}
 	}
@@ -287,7 +392,7 @@ function buildControlUI()
 	//Интерфейсы режимов
 	
 	if( app.data.mode == 1 ){
-		for(  let portNum in app.data.ports ){
+		for( let portNum in app.data.ports ){
 			let portData = app.data.ports[ portNum ];
 			for( let zoneNum in portData.zones ){
 				let zoneData = portData.zones[ zoneNum ];
@@ -387,72 +492,10 @@ function buildSettingsUI()
 		return undefined;
 	}
 
-	addHeader( obj, 'Main' );
 
-	let box = document.createElement( 'div' );
-	box.classList = 'block';
-	obj.appendChild( box );
-
-	let modeBox = document.createElement( 'select' );
-	modeBox.name = 'mode';
-	modeBox.value = app.data.mode;
-		for( let num in app.modsAvailable ){
-			if( app.modsAvailable[ num ] == '' ) continue;
-			let option = document.createElement( 'option' );
-			option.value = num;
-			option.label = app.modsAvailable[ num ];
-			if( app.data.mode == num ) option.selected = true;
-			modeBox.appendChild( option );
-		}
-	modeBox.onchange = function(){
-		changeParam( this );
-		app.data.mode = this.value;
-	};
-	addString( box, 'Mode', modeBox );
-
-
-
-	addHeader( obj, 'IO' );
-	let box2 = document.createElement( 'div' );
-	box2.id = 'ioConfigureBlock';
-	box2.classList = 'block';
-	obj.appendChild( box2 );
 	rebuildInputsOutsSettings();
 
-	addHeader( obj, 'Zones' );
-	let box3 = document.createElement( 'div' );
-	box3.id = 'zonesConfigureBlock';
-	box3.classList = 'block';
-	obj.appendChild( box3 );
 	rebuildZonesSettings();
-	
-
-	addHeader( obj, 'Effects' );
-	let box4 = document.createElement( 'div' );
-	box4.id = 'effectsConfigureBlock';
-	box4.classList = 'block';
-	obj.appendChild( box4 );
-
-	let effectRainbowSpeedNE = createEditorElement( 'number', '', 'rainbow_speed', function(){ changeEffect( this ); }, 0, 255 );
-	effectRainbowSpeedNE.size = 4;
-	addString( box4, 'Rainbow speed', effectRainbowSpeedNE );
-	let effectRainbowStepNE = createEditorElement( 'number', '', 'rainbow_step', function(){ changeEffect( this ); }, 0, 255 );
-	effectRainbowStepNE.size = 4;
-	addString( box4, 'Rainbow step', effectRainbowStepNE );
-	let effectFireSpeedNE = createEditorElement( 'number', '', 'fire_speed', function(){ changeEffect( this ); }, 0, 255 );
-	effectFireSpeedNE.size = 4;
-	addString( box4, 'Fire speed', effectFireSpeedNE );
-	let effectFireStepNE = createEditorElement( 'number', '', 'fire_step', function(){ changeEffect( this ); }, 0, 255 );
-	effectFireStepNE.size = 4;
-	addString( box4, 'Fire step', effectFireStepNE );
-	let effectPulseSpeedNE = createEditorElement( 'number', '', 'pulse_speed', function(){ changeEffect( this ); }, 0, 255 );
-	effectPulseSpeedNE.size = 4;
-	addString( box4, 'Pulse speed', effectPulseSpeedNE );
-	let effectPulseStepNE = createEditorElement( 'number', '', 'pulse_step', function(){ changeEffect( this ); }, 0, 255 );
-	effectPulseStepNE.size = 4;
-	addString( box4, 'Pulse step', effectPulseStepNE );
-	
-
 
 
 	let buttonBox = document.createElement( 'div' );
@@ -540,11 +583,12 @@ function rebuildInputsOutsSettings()
 		let leds = app.data.leds[ i ];
 		let checked = ( use ) ? ' checked' : '';
 		let disabled = ( !Number( use ) ) ? ' disabled' : '';
-		let portName = 'Port ' + ( i + 1 );
+		let humanityPort = i + 1;
+		let portName = 'Port ' + humanityPort;
 
 		let div = document.createElement( 'div' );
 		div.className = 'flex';
-		div.innerHTML = '<input type="checkbox" name="u_port" lang="' + i + '" onchange="changeState( this );"' + checked + '><input type="number" min="0" max="9999" name="port" lang="' + i + '" onchange="changePortSize( this );" value="' + leds + '" size="4"' + disabled + '>';
+		div.innerHTML = '<input type="checkbox" name="u_port" lang="' + i + '" onchange="changeState( this );"' + checked + '><input type="number" min="0" max="9999" name="port" lang="' + humanityPort + '" onchange="changePortSize( this );" value="' + leds + '" size="4"' + disabled + '>';
 
 		addString( obj, portName, div );
 	}
@@ -570,7 +614,8 @@ function rebuildInputsOutsSettings()
 //-----------------------------------------------------------------------------
 function rebuildZonesSettings()
 {
-	let obj = document.getElementById( 'zonesConfigureBlock' );
+	let obj = document.getElementById( 'zonesBox' );
+	if( obj != undefined ) obj = obj.lastElementChild;
 	if( obj == undefined ) return;
 
 	obj.innerHTML = '';
@@ -580,11 +625,14 @@ function rebuildZonesSettings()
 		let port						= app.data.zones[ i ].port;
 		let start						= app.data.zones[ i ].start;
 		let count						= app.data.zones[ i ].count;
+		let color						= app.data.effects.zoneColors[ i ];
 		let name						= 'Zone ' + ( i + 1 );
+
+		if( color == undefined ) color = { r: 0, g: 0, b: 0 };
 
 		let div = document.createElement( 'div' );
 		div.className = 'flex';
-		div.innerHTML = '<input type="number" min="0" max="8" name="portAtZone" lang="' + i + '" onchange="changeZone( this );" value="' + port + '" size="3"><input type="number" min="0" max="9999" name="startAtZone" lang="' + i + '" onchange="changeZone( this );" value="' + start + '" size="5"><input type="number" min="0" max="9999" name="countAtZone" lang="' + i + '" onchange="changeZone( this );" value="' + count + '" size="5">';
+		div.innerHTML = '<input type="number" min="0" max="8" name="portAtZone" lang="' + i + '" onchange="changeZone( this );" value="' + port + '" size="3"><input type="number" min="0" max="9999" name="startAtZone" lang="' + i + '" onchange="changeZone( this );" value="' + start + '" size="5"><input type="number" min="0" max="9999" name="countAtZone" lang="' + i + '" onchange="changeZone( this );" value="' + count + '" size="5"><input type="color" name="zoneColor" value="#' + rgbToHex( color ) + '" lang="' + i + '" onChange="changeEffect( this );">';
 
 		addString( obj, name, div );
 	}
@@ -608,9 +656,10 @@ function changeParam( element, valueLen = 0, value = undefined )
 	}else if( element.tagName == 'BUTTON' ){
 		valueLen = 1;
 		switch( element.value ){
-			case 'reboot':			value = 0x00;		break;
-			case 'saveReboot':		value = 0x01;		break;
-			case 'save':			value = 0x02;		break;
+			case 'reboot':			value = 0x00;				break;
+			case 'saveReboot':		value = 0x01;				break;
+			case 'save':			value = 0x02;				break;
+			case 'mode':			value = element.lang;		break;
 		}
 	}else if( value == undefined ){
 		value = [];
@@ -669,6 +718,18 @@ function CheckBit( reg, bit )
 	reg = Number( Number( reg ).toFixed() );
 	bit = Number( Number( bit ).toFixed() );
 	return ( ( reg & (1<<bit ) ) != 0 ) ? 1 : 0;
+}
+
+//-----------------------------------------------------------------------------
+function updateMemory()
+{
+	setTimeout( updateMemory, 250 );
+	if( app.ws.readyState != 1 ) return;
+
+	let binary = new Uint8Array( 1 );
+	// Command for get free memory
+	binary[ 0 ] = 0xF3;
+	app.ws.send( binary.buffer );
 }
 
 //-----------------------------------------------------------------------------
@@ -826,7 +887,8 @@ function changeZone( element )
 //-----------------------------------------------------------------------------
 function changeEffect( element )
 {
-	let value = element.value;
+	let tmpValue = new Uint8Array( 1 );
+	let value = [];
 
 	let obj = document.createElement( 'input' );
 	obj.name = 'effect';
@@ -834,10 +896,36 @@ function changeEffect( element )
 
 	if( element.name == 'rainbow_speed' ){
 		app.data.effects.rainbow_speed = element.value;
+		value.push( element.value );
 	}else if( element.name == 'rainbow_step' ){
 		app.data.effects.rainbow_step = element.value;
+		value.push( element.value );
+	}else if( element.name == 'fire_speed' ){
+		app.data.effects.fire_speed = element.value;
+		value.push( element.value );
+	}else if( element.name == 'fire_step' ){
+		app.data.effects.fire_step = element.value;
+		value.push( element.value );
+	}else if( element.name == 'pulse_speed' ){
+		app.data.effects.pulse_speed = element.value;
+		value.push( element.value );
+	}else if( element.name == 'pulse_step' ){
+		app.data.effects.pulse_step = element.value;
+		value.push( element.value );
+	}else if( element.name == 'masterColor' ){
+		app.data.effects.masterColor = hexToRgb( element.value );
+		value.push( app.data.effects.masterColor.r );
+		value.push( app.data.effects.masterColor.g );
+		value.push( app.data.effects.masterColor.b );
+	}else if( element.name == 'zoneColor' ){
+		let rgb = hexToRgb( element.value );
+		app.data.effects.zoneColors[ element.lang ] = rgb;
+		value.push( element.lang );
+		value.push( rgb.r );
+		value.push( rgb.g );
+		value.push( rgb.b );
 	}
-
+	
 	let effectID = 0xFF;
 	for( let indx in app.effectIDs ){
 		if( app.effectIDs[ indx ] == element.name ){
@@ -846,11 +934,13 @@ function changeEffect( element )
 		}
 	}
 
-	let data = new Uint8Array( 3 );
-
-	data[ 0 ] = effectID;
-	data[ 1 ] = value >> 8;
-	data[ 2 ] = value;
+	let data = new Uint8Array( 2 + value.length );
+	let offset = 0;
+	data[ offset++ ] = effectID;
+	data[ offset++ ] = value.length;
+	for( let i = 0; i < value.length; i++ ){
+		data[ offset++ ] = value[ i ];
+	}
 	
 	changeParam( obj, data.length, data );
 }
@@ -877,7 +967,7 @@ function changePortSize( element )
 }
 
 //-----------------------------------------------------------------------------
-function createEditorElement( type = '', className = '',  name = '', onchange = undefined, min = undefined, max = undefined )
+function createEditorElement( type = '', className = '', name = '', onchange = undefined, min = undefined, max = undefined )
 {
 	let element = undefined;
 

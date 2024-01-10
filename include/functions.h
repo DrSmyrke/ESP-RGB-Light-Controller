@@ -15,7 +15,6 @@
 void startMode0(void);
 void startMode1(void);
 void startMode2(void);
-void startMode3(void);
 void animationStart(void);
 void animationProcess(void);
 // void getPageHeadler(void);

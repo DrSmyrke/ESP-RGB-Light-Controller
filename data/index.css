@@ -6,16 +6,16 @@ body{
 	background: #E6E4E7;
 	font-family: 'Arial','Sans';-webkit-touch-callout: none;-webkit-user-select: none;-khtml-user-select: none;-moz-user-select: none;-ms-user-select: none;user-select: none;
 }
-.flex{ display: flex; }
-.hidden{ display: none; }
+
+.hidden{ display: none !important; }
 code,.code{-webkit-touch-callout: default;-webkit-user-select: text; -khtml-user-select: text;   -moz-user-select: text;-ms-user-select: text;user-select: text;}
 a{ color: #459EBC; }
 header, footer{
 	z-index: var( --footer-header-zVaflue );
-	position: sticky;
-	/* left: 0px; */
+	position: fixed;
+	left: 0px;
 	width: 100%;
-	/* margin: 0px; */
+	margin: 0px;
 	display: flex;
 	justify-content: space-around;
 	align-items: center;
@@ -41,7 +41,8 @@ footer .button.selected {
 	background: none;
 	opacity: 1;
 }
-.contentBox{ display: flex; flex-direction: column; align-items: center; }
+footer .button.selected svg { fill: red; }
+.contentBox{ display: flex; flex-direction: column; align-items: center; margin-bottom: 64px; }
 
 button, .button{
 	display: flex;
@@ -52,11 +53,19 @@ button, .button{
 	justify-content: center;
 	outline: none;
 	border: none;
+	align-items: center;
 }
 button .content, .button .content, button text, .button text{ margin: 8px 12px; }
+footer button text, footer .button text{ margin: 2px 8px; }
 button.delete, .button.delete{background-color: #ff4141;color: white;}
 button:hover, .button:hover{cursor:pointer; transform: scale( 1.05 ); z-index: 999; position: relative;}
 
+button.mode svg, .button.mode svg{
+	width: 64px;
+	height: 64px;
+	margin: 4px;
+}
+button.mode.selected, .button.mode.selected{ background: orange; }
 
 
 .block{
@@ -88,7 +97,9 @@ button:hover, .button:hover{cursor:pointer; transform: scale( 1.05 ); z-index: 9
 .info, i{color: gray;font-style: italic;font-size:8pt;}
 
 
-
+.flex{ display: flex; }
+.flex.wrap{ flex-wrap: wrap; }
+.flex.column{ flex-direction: column; }
 
 input[type="checkbox"] {
 	width: 48px;
@@ -149,3 +160,10 @@ input:disabled{ opacity: 0.15; }
 	text-shadow:0px 0px 5px #FF6E6B;
 	color:#FF0600;
 }
+
+
+
+
+
+
+

@@ -23,7 +23,7 @@ void startMode0(void)
 	}
 
 	m_animationCounterMax = app.param.effects.pulse_speed;
-	m_animationCounter = m_animationCounterMax;
+	m_animationCounter = 0;
 }
 
 //-----------------------------------------------------------------------------------------
@@ -36,20 +36,14 @@ void startMode1(void)
 	if( app.param.use.port5 ) app.port5[ 0 ] = CRGB( 255, 0, 0 );
 
 	m_animationCounterMax = app.param.effects.rainbow_speed;
-	m_animationCounter = m_animationCounterMax;
+	m_animationCounter = 0;
 }
 
 //-----------------------------------------------------------------------------------------
 void startMode2(void)
 {
 	m_animationCounterMax = app.param.effects.fire_speed;
-	m_animationCounter = m_animationCounterMax;
-}
-
-//-----------------------------------------------------------------------------------------
-void startMode3(void)
-{
-	FastLED.showColor( CRGB( app.param.effects.masterColor.r, app.param.effects.masterColor.g, app.param.effects.masterColor.b ) );
+	m_animationCounter = 0;
 }
 
 //-----------------------------------------------------------------------------------------
@@ -57,13 +51,14 @@ void animationStart(void)
 {
 	FastLED.clear();
 	FastLED.showColor( CRGB( 0, 0, 0 ) );
+	app.orderNum = 0;
 
 	/*
 		'Радуга',
 		'Огонь',
 		'Один цвет',
-
 		'Зонирование',
+
 		'Мигалка',
 		'Гонки',
 		'',
@@ -74,7 +69,8 @@ void animationStart(void)
 	switch( app.param.mode ){
 		case 1:		startMode1();			break;	//Rianbow
 		case 2:		startMode2();			break;	//Fire
-		case 3:		startMode3();			break;	//One color
+		case 3:		oneColor();				break;	//One color
+		case 4:		zonesColor();			break;	//Zones color
 		case 0:
 		default:	startMode0();			break;
 	}
@@ -85,12 +81,19 @@ void animationStart(void)
 //-----------------------------------------------------------------------------------------
 void animationProcess(void)
 {
-	switch( app.param.mode ){
-		case 1:		rainbow();				break;
-		case 2:		fire();					break;
-		case 0:
-		default:	pulse();				break;
+	if( m_animationCounter ){
+		m_animationCounter--;
+		return;
 	}
+
+	switch( app.param.mode ){
+		case 0:		pulse();pulse();				break;
+		case 1:		rainbow();						break;
+		case 2:		fire();							break;
+	}
+	
+	m_animationCounter = m_animationCounterMax;
+	FastLED.show();
 }
 
 //-----------------------------------------------------------------------------------------
@@ -351,6 +354,28 @@ void resetOuts(void)
 //-----------------------------------------------------------------------------------------
 void applySettings(void)
 {
+	if( app.param.effects.rainbow_speed == 0 ) app.param.effects.rainbow_speed = EFFECT_RAINBOW_SPEED;
+	if( app.param.effects.rainbow_step == 0 ) app.param.effects.rainbow_step = EFFECT_RAINBOW_STEP;
+	if( app.param.effects.fire_speed == 0 ) app.param.effects.fire_speed = EFFECT_FIRE_SPEED;
+	if( app.param.effects.fire_step == 0 ) app.param.effects.fire_step = EFFECT_FIRE_STEP;
+	if( app.param.effects.pulse_speed == 0 ) app.param.effects.pulse_speed = EFFECT_PULSE_SPEED;
+	if( app.param.effects.pulse_step == 0 ) app.param.effects.pulse_step = EFFECT_PULSE_STEP;
+	if( app.param.effects.fire_hue_gap == 0 ) app.param.effects.fire_hue_gap = EFFECT_FIRE_HUE_GAP;
+	// if( app.param.effects.fire_hue_start == 0 ) app.param.effects.fire_hue_start = EFFECT_FIRE_HUE_START;
+	if( app.param.effects.fire_min_bright == 0 ) app.param.effects.fire_min_bright = EFFECT_FIRE_MIN_BRIGHT;
+	if( app.param.effects.fire_max_bright == 0 ) app.param.effects.fire_max_bright = EFFECT_FIRE_MAX_BRIGHT;
+	if( app.param.effects.fire_min_sat == 0 ) app.param.effects.fire_min_sat = EFFECT_FIRE_MIN_SAT;
+	if( app.param.effects.fire_max_sat == 0 ) app.param.effects.fire_max_sat = EFFECT_FIRE_MAX_SAT;
+
+	if( app.param.port1_size > LENTA_COUNT_MAX ) app.param.port1_size = LENTA_COUNT_MAX;
+	if( app.param.port2_size > LENTA_COUNT_MAX ) app.param.port2_size = LENTA_COUNT_MAX;
+	if( app.param.port3_size > LENTA_COUNT_MAX ) app.param.port3_size = LENTA_COUNT_MAX;
+	if( app.param.port4_size > LENTA_COUNT_MAX ) app.param.port4_size = LENTA_COUNT_MAX;
+	if( app.param.port5_size > LENTA_COUNT_MAX ) app.param.port5_size = LENTA_COUNT_MAX;
+	if( app.param.port6_size > LENTA_COUNT_MAX ) app.param.port6_size = LENTA_COUNT_MAX;
+	if( app.param.port7_size > LENTA_COUNT_MAX ) app.param.port7_size = LENTA_COUNT_MAX;
+	if( app.param.port8_size > LENTA_COUNT_MAX ) app.param.port8_size = LENTA_COUNT_MAX;
+
 #ifdef LENTA1_PIN
 	if( app.port1 != nullptr ) free( app.port1 );
 	app.port1 = (CRGB*)malloc( app.param.port1_size * sizeof( CRGB ) );
@@ -387,14 +412,14 @@ void webSocketEvent(byte num, WStype_t type, uint8_t * payload, size_t length)
 	ESP_DEBUG( "WS Type %u: \n", type );
 
 	switch( type ){
-		case WStype_DISCONNECTED: // enum that read status this is used for debugging.
-			ESP_DEBUG( "DISCONNECTED\n" );
-			animationStart();
-		break;
-		case WStype_CONNECTED:  // Check if a WebSocket client is connected or not
-			FastLED.showColor( CRGB( 37, 173, 0 ) );
-			ESP_DEBUG( "CONNECTED\n", type );
-		break;
+		// case WStype_DISCONNECTED: // enum that read status this is used for debugging.
+			// ESP_DEBUG( "DISCONNECTED\n" );
+			// animationStart();
+		// break;
+		// case WStype_CONNECTED:  // Check if a WebSocket client is connected or not
+			// FastLED.showColor( CRGB( 37, 173, 0 ) );
+			// ESP_DEBUG( "CONNECTED\n" );
+		// break;
 		case WStype_BIN:
 			ESP_DEBUG( "WS RCV: [%u bytes] [", length );
 			for( uint16_t i = 0; i < length; i++ ) ESP_DEBUG( "%02X ", payload[ i ] );
@@ -416,33 +441,20 @@ void webSocketEvent(byte num, WStype_t type, uint8_t * payload, size_t length)
 								case 0x00:		// device mode	(1 byte)
 									app.param.mode = payload[ 2 ];
 									animationStart();
+									saveSettings();
 								break;
 								case 0x01:		// use ports	(1 byte)
 									if( length >= 3 ){
 										uint8_t* pointer = (uint8_t*)&app.param.use;
 										pointer[ 0 ] = payload[ 2 ];
-										// app.param.use.port1 = CheckBit( payload[ 2 ], 0 );
-										// app.param.use.port2 = CheckBit( payload[ 2 ], 1 );
-										// app.param.use.port3 = CheckBit( payload[ 2 ], 2 );
-										// app.param.use.port4 = CheckBit( payload[ 2 ], 3 );
-										// app.param.use.port5 = CheckBit( payload[ 2 ], 4 );
-										// app.param.use.port6 = CheckBit( payload[ 2 ], 5 );
-										// app.param.use.port7 = CheckBit( payload[ 2 ], 6 );
-										// app.param.use.port8 = CheckBit( payload[ 2 ], 7 );
+										applySettings();
+										animationStart();
 									}
 								break;
 								case 0x02:		// use outs		(1 byte)
 									if( length >= 3 ){
 										uint8_t* pointer = (uint8_t*)&app.param.use;
 										pointer[ 1 ] = payload[ 2 ];
-										// app.param.use.out1 = CheckBit( payload[ 2 ], 0 );
-										// app.param.use.out2 = CheckBit( payload[ 2 ], 1 );
-										// app.param.use.out3 = CheckBit( payload[ 2 ], 2 );
-										// app.param.use.out4 = CheckBit( payload[ 2 ], 3 );
-										// app.param.use.out5 = CheckBit( payload[ 2 ], 4 );
-										// app.param.use.out6 = CheckBit( payload[ 2 ], 5 );
-										// app.param.use.out7 = CheckBit( payload[ 2 ], 6 );
-										// app.param.use.out8 = CheckBit( payload[ 2 ], 7 );
 									}
 								break;
 								case 0x03:		// outs state	(1 byte)
@@ -452,12 +464,13 @@ void webSocketEvent(byte num, WStype_t type, uint8_t * payload, size_t length)
 									// Action ID
 									switch( payload[ 2 ] ){
 										case 0x00:		// reboot
-											ESP.reset();
+											// ESP.reset();
+											ESP.restart();
 										break;
 										case 0x01:		// saveReboot
 											saveSettings();
 											delay( 730 );
-											ESP.reset();
+											ESP.restart();
 										break;
 										case 0x02:		// save
 											saveSettings();
@@ -472,32 +485,54 @@ void webSocketEvent(byte num, WStype_t type, uint8_t * payload, size_t length)
 										app.param.zones[ zone->zoneNum ].port = zone->port;
 										app.param.zones[ zone->zoneNum ].start = ( zone->start[ 0 ] << 8 ) | zone->start[ 1 ];
 										app.param.zones[ zone->zoneNum ].count = ( zone->count[ 0 ] << 8 ) | zone->count[ 1 ];
+										if( app.param.mode == 4 ) animationStart();
 									}
 								}
 								break;
-								case 0x06:		// effect param	(1-2 byte)
+								case 0x06:		// effect param
 								if( length >= 5 ){
 									WS::Packet_effect* effect = ( WS::Packet_effect* ) payload;
-									uint16_t value = ( effect->data[ 0 ] << 8 ) | ( effect->data[ 1 ] );
-									if( effect->effectID == 0x00 ){
-										app.param.effects.rainbow_speed = value;
-									}else if( effect->effectID == 0x01 ){
-										app.param.effects.rainbow_step = value;
-									}else if( effect->effectID == 0x02 ){
-										app.param.effects.fire_speed = value;
-									}else if( effect->effectID == 0x03 ){
-										app.param.effects.fire_step = value;
-									}else if( effect->effectID == 0x04 ){
-										app.param.effects.pulse_speed = value;
-									}else if( effect->effectID == 0x05 ){
-										app.param.effects.pulse_step = value;
+									if( length == 5 ){
+										uint16_t value = effect->data[ 0 ];
+										if( effect->effectID == 0x00 ){
+											app.param.effects.rainbow_speed = value;
+										}else if( effect->effectID == 0x01 ){
+											app.param.effects.rainbow_step = value;
+										}else if( effect->effectID == 0x02 ){
+											app.param.effects.fire_speed = value;
+										}else if( effect->effectID == 0x03 ){
+											app.param.effects.fire_step = value;
+										}else if( effect->effectID == 0x04 ){
+											app.param.effects.pulse_speed = value;
+										}else if( effect->effectID == 0x05 ){
+											app.param.effects.pulse_step = value;
+										}
+									}else if( length == 6 ){
+										uint16_t value = ( effect->data[ 0 ] << 8 ) | ( effect->data[ 1 ] );
+									}else if( length == 7 ){
+										if( effect->effectID == 0x06 ){
+											app.param.effects.masterColor.r = effect->data[ 0 ];
+											app.param.effects.masterColor.g = effect->data[ 1 ];
+											app.param.effects.masterColor.b = effect->data[ 2 ];
+										}
+									}else if( length == 8 ){
+										if( effect->effectID == 0x07 ){
+											uint8_t zoneID = effect->data[ 0 ];
+											if( zoneID < ZONES_MAX ){
+												app.param.effects.zonesColor[ zoneID ].r = effect->data[ 1 ];
+												app.param.effects.zonesColor[ zoneID ].g = effect->data[ 2 ];
+												app.param.effects.zonesColor[ zoneID ].b = effect->data[ 3 ];
+											}
+										}
 									}
+									animationStart();
 								}
 								break;
 								case 0x07:		// port count	(3 byte)
 								if( length >= 5 ){
 									WS::Packet_portSize* port = ( WS::Packet_portSize* ) payload;
 									uint16_t size = ( payload[ 3 ] << 8 ) | ( payload[ 4 ] );
+									if( size > LENTA_COUNT_MAX ) size = LENTA_COUNT_MAX;
 									switch( port->num ){
 										case 1:		app.param.port1_size = size;	break;
 										case 2:		app.param.port2_size = size;	break;
@@ -508,92 +543,35 @@ void webSocketEvent(byte num, WStype_t type, uint8_t * payload, size_t length)
 										case 7:		app.param.port7_size = size;	break;
 										case 8:		app.param.port8_size = size;	break;
 									}
+									if( port->num >= 1 && port->num <= 8 ){
+										applySettings();
+										animationStart();
+									}
 								}
 								break;
 							}
 						}
 					break;
+					case 0xF3:		// get memory status
+						{
+							uint32_t free = ESP.getFreeHeap();
+							uint32_t total = 81920;
+							uint8_t data[ 9 ];
+							data[ 0 ] = 0xA2;
+							data[ 1 ] = free >> 24;
+							data[ 2 ] = free >> 16;
+							data[ 3 ] = free >> 8;
+							data[ 4 ] = free;
+							data[ 5 ] = total >> 24;
+							data[ 6 ] = total >> 16;
+							data[ 7 ] = total >> 8;
+							data[ 8 ] = total;
+							webSocket.broadcastBIN( data, sizeof( data ) );
+						}
+					break;
 					default: break;
 				}
 			}
-			
-			// 	// ESP_DEBUG( "[%04X][%04X][%04X]\n", payload[ 0 ], payload[ 1 ], payload[ 2 ] );
-			// 	if( payload[ 0 ] == 0xF1 ){
-			// 		app.param.mode = ( payload[ 1 ] == 1 ) ? 1 : 0;
-			// 		saveSettings();
-			// 	}
-			// }else{
-			// 	// Check data at file
-			// 	ESP_DEBUG( "DATA LEN [%u]\n", length );
-			// 	printRawData( payload, length );
-
-			// 	if( payload[ 0 ] == 0xA1 && payload[ 1 ] == 0x1A ){
-			// 		// Обнуляем индекс сырых данных
-			// 		app.uploadDataIndx = 0;
-
-			// 		// Копируем данные
-			// 		if( ( app.uploadDataIndx + length ) < RAW_DATA_BUFF_SIZE ){
-			// 			uint8_t* ptr = app.uploadData + app.uploadDataIndx;
-			// 			memcpy( ptr, payload, length );
-			// 			app.uploadDataIndx += length;
-			// 		}
-
-			// 		// Checking new file...
-			// 		LOGO_Config* config = (LOGO_Config*)app.uploadData;
-
-			// 		if( config->key[ 0 ] == 0xA1 && config->key[ 1 ] == 0x1A ){
-			// 			ESP_DEBUG( "Key successed!\n" );
-
-			// 			uint16_t length = ( config->length[ 0 ] << 8 ) | ( config->length[ 1 ] );
-			// 			uint16_t crc = config->inputsNum + config->outputsNum + config->functionsNum + length;
-
-			// 			if( app.uploadDataIndx == ( length + sizeof( LOGO_Config ) + sizeof( crc ) ) ){
-			// 				ESP_DEBUG( "Checking data length successed!\n" );
-
-			// 				//Computing CRC
-			// 				uint16_t crcOffset = app.uploadDataIndx - sizeof( crc );
-			// 				for( uint16_t i = sizeof( LOGO_Config ); i < crcOffset; i++ ){
-			// 					crc += app.uploadData[ i ];
-			// 				}
-				
-			// 				uint16_t readCRC = ( app.uploadData[ crcOffset ] << 8 ) | ( app.uploadData[ crcOffset + 1 ] );
-
-			// 				if( crc == readCRC ){
-			// 					ESP_DEBUG( "Checking CRC successed!\n" );
-			// 					// Заменяем файл проекта в памяти
-			// 					saveProjectFile();
-
-			// 					// Заменяем сырые данные загруженными
-			// 					clearRawData();
-			// 					memcpy( app.rawData, app.uploadData, app.uploadDataIndx );
-
-			// 					// Применяем конфиг проекта
-			// 					parsingConfig();
-
-			// 					// Отвечаем клиенту
-			// 					app.uploadData[ 0 ] = WebSocket_Commands::UPLOAD_RESPONSE;
-			// 					app.uploadData[ 1 ] = Upload_Result::OK;
-			// 					webSocket.broadcastBIN( app.uploadData, 2 );
-			// 				}else{
-			// 					ESP_DEBUG( "Checking CRC failed! [%02X][%02X]\n", readCRC, crc );
-			// 					app.uploadData[ 0 ] = WebSocket_Commands::UPLOAD_RESPONSE;
-			// 					app.uploadData[ 1 ] = Upload_Result::CRC_ERROR;
-			// 					webSocket.broadcastBIN( app.uploadData, 2 );
-			// 				}
-			// 			}else{
-			// 				ESP_DEBUG( "Checking data length failed!\n" );
-			// 				app.uploadData[ 0 ] = WebSocket_Commands::UPLOAD_RESPONSE;
-			// 				app.uploadData[ 1 ] = Upload_Result::LENGTH_ERROR;
-			// 				webSocket.broadcastBIN( app.uploadData, 2 );
-			// 			}
-			// 		}else{
-			// 			ESP_DEBUG( "Checking header file failed!\n" );
-			// 			app.uploadData[ 0 ] = WebSocket_Commands::UPLOAD_RESPONSE;
-			// 			app.uploadData[ 1 ] = Upload_Result::FILE_ERROR;
-			// 			webSocket.broadcastBIN( app.uploadData, 2 );
-			// 		}
-			// 	}
-			// }
 		break;
 	}
 }

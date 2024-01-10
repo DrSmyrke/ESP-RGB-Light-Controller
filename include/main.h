@@ -5,7 +5,6 @@
 #include <ESP8266WiFi.h>
 #include <ESP8266WebServer.h>
 #include <esp_functions.h>
-#include <DNS_Server.h>
 #include <timer.h>
 #include <WebSocketsServer.h>
 #include <FastLED.h>
@@ -15,7 +14,8 @@
 //----------- DEFINES ----------------------------------------------------------------------
 #define DEVICE_NAME												"RGB_Light_Controller"
 #define AP_ADMIN_USERNAME										"admin"
-#define LENTA_COUNT_MAX											2048
+#define LENTA_COUNT_MAX											1024
+#define LENTS_COUNT_MAX											8
 #define LENTS_COUNT												5
 #define OUTS_COUNT												4
 #define LENTA1_SIZE												8
@@ -26,14 +26,14 @@
 #define LENTA1_PIN												D8
 #define LENTA2_PIN												D7
 #define LENTA3_PIN												D6
-#define LENTA4_PIN												D7
+#define LENTA4_PIN												D5
 #define LENTA5_PIN												D3
 #define OUT1_PIN												D2
 #define OUT2_PIN												D1
 #define OUT3_PIN												D0
 #define OUT4_PIN												10
-#define WEB_PAGE_BUFF_SIZE										2048
-#define ZONES_MAX												50
+#define WEB_PAGE_BUFF_SIZE										1024
+#define ZONES_MAX												25
 #define DEFAULT_BRIGHTNESS										37
 #define MAX_BRIGHTNESS											255
 
@@ -69,7 +69,8 @@ namespace WS{
 	struct Packet_effect{
 		Header header;
 		uint8_t effectID;
-		uint8_t data[ 2 ];
+		uint8_t dataLen;
+		uint8_t data[ 12 ];
 	};
 	struct Packet_portSize{
 		Header header;
@@ -91,6 +92,12 @@ struct Color
 	uint8_t b;
 };
 
+struct Order
+{
+	uint8_t port;
+	uint8_t dir;
+};
+
 
 struct AppData{
 	struct{
@@ -103,6 +110,8 @@ struct AppData{
 	CRGB *port3;
 	CRGB *port4;
 	CRGB *port5;
+
+	uint8_t orderNum;
 
 	struct{
 		uint8_t startByte;
@@ -150,11 +159,20 @@ struct AppData{
 		struct{
 			uint8_t rainbow_speed;
 			uint8_t rainbow_step;
+			Order rainbow_orders[ LENTS_COUNT_MAX ];
 			uint8_t fire_speed;
 			uint8_t fire_step;
+			uint8_t fire_hue_gap;
+			uint8_t fire_hue_start;
+			uint8_t fire_min_bright;
+			uint8_t fire_max_bright;
+			uint8_t fire_min_sat;
+			uint8_t fire_max_sat;
 			uint8_t pulse_speed;
 			uint8_t pulse_step;
+			Order pulse_orders[ LENTS_COUNT_MAX ];
 			Color masterColor;
+			Color zonesColor[ ZONES_MAX ];
 		} effects;
 	} param;
 };
