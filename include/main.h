@@ -112,6 +112,9 @@ struct AppData{
 	CRGB *port5;
 
 	uint8_t orderNum;
+	struct{
+		uint8_t pulse_current_color;
+	} effects;
 
 	struct{
 		uint8_t startByte;
@@ -157,9 +160,11 @@ struct AppData{
 		uint8_t zonesCount;
 		Zone zones[ ZONES_MAX ];
 		struct{
+			uint8_t rainbow_anim_delay;
 			uint8_t rainbow_speed;
 			uint8_t rainbow_step;
 			Order rainbow_orders[ LENTS_COUNT_MAX ];
+			uint8_t fire_anim_delay;
 			uint8_t fire_speed;
 			uint8_t fire_step;
 			uint8_t fire_hue_gap;
@@ -168,6 +173,7 @@ struct AppData{
 			uint8_t fire_max_bright;
 			uint8_t fire_min_sat;
 			uint8_t fire_max_sat;
+			uint8_t pulse_anim_delay;
 			uint8_t pulse_speed;
 			uint8_t pulse_step;
 			Order pulse_orders[ LENTS_COUNT_MAX ];

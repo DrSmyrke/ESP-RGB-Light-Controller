@@ -21,12 +21,12 @@
 				
 				<div class="header">Control</div>
 				<div class="block">
-					<div class="string hidden" lang="3">
+					<div class="hidden" lang="3">
 						<div class="string">
 							<text>Master color</text><input type="color" name="masterColor" value="#' + rgbToHex( app.data.effects.masterColor ) + '" onChange="changeEffect( this );">
 						</div>
 					</div>
-					<div class="string hidden" lang="4">
+					<div class="hidden" lang="4">
 						
 					</div>
 				</div>
@@ -37,12 +37,20 @@
 				<div class="header">Effects</div>
 				<div class="block">
 					<div class="string">
+						<text>Rainbow animation delay</text>
+						<input type="number" name="rainbow_anim_delay" min="0" max="255" size="4" onChange="changeEffect( this );">
+					</div>
+					<div class="string">
 						<text>Rainbow speed</text>
 						<input type="number" name="rainbow_speed" min="0" max="255" size="4" onChange="changeEffect( this );">
 					</div>
 					<div class="string">
 						<text>Rainbow step</text>
 						<input type="number" name="rainbow_step" min="0" max="255" size="4" onChange="changeEffect( this );">
+					</div>
+					<div class="string">
+						<text>Fire animation delay</text>
+						<input type="number" name="fire_anim_delay" min="0" max="255" size="4" onChange="changeEffect( this );">
 					</div>
 					<div class="string">
 						<text>Fire speed</text>
@@ -77,6 +85,10 @@
 						<input type="number" name="fire_max_sat" min="0" max="255" size="4" onChange="changeEffect( this );">
 					</div>
 					<div class="string">
+						<text>Pulse animation delay</text>
+						<input type="number" name="pulse_anim_delay" min="0" max="255" size="4" onChange="changeEffect( this );">
+					</div>
+					<div class="string">
 						<text>Pulse speed</text>
 						<input type="number" name="pulse_speed" min="0" max="255" size="4" onChange="changeEffect( this );">
 					</div>
@@ -85,6 +97,9 @@
 						<input type="number" name="pulse_step" min="0" max="255" size="4" onChange="changeEffect( this );">
 					</div>
 				</div>
+				<button name="action" value="save" onClick="changeParam( this );">
+					<text>Save</text>
+				</button>
 			</div>
 
 			<div id="zonesBox" class="hidden">

@@ -5,7 +5,7 @@ AppData app;
 ESP8266WebServer webServer( 80 );
 WebSocketsServer webSocket( 81 );
 Timer timer0( 0, 1000, timer0Interrupt );
-Timer timer1( 0, 1, timer1Interrupt );
+Timer timer1( 0, 2, timer1Interrupt );
 
 // CRGB leds2[ LENTA2_COUNT ];
 // Adafruit_NeoPixel port1( LENTA1_COUNT, LENTA2_PIN, NEO_GRB + NEO_KHZ800 );
@@ -45,6 +45,8 @@ void setup()
 	app.port4													= nullptr;
 	app.port5													= nullptr;
 	app.orderNum												= 0;
+
+	app.effects.pulse_current_color								= 0;
 
 	app.param.startByte											= 0xA1;
 	app.param.mode												= 0;
@@ -108,8 +110,10 @@ void setup()
 	app.param.port8_size										= 0;
 #endif
 
+	app.param.effects.rainbow_anim_delay						= EFFECT_RAINBOW_ANIM_DELAY;
 	app.param.effects.rainbow_speed								= EFFECT_RAINBOW_SPEED;
 	app.param.effects.rainbow_step								= EFFECT_RAINBOW_STEP;
+	app.param.effects.fire_anim_delay							= EFFECT_FIRE_ANIM_DELAY;
 	app.param.effects.fire_speed								= EFFECT_FIRE_SPEED;
 	app.param.effects.fire_step									= EFFECT_FIRE_STEP;
 	app.param.effects.fire_hue_gap								= EFFECT_FIRE_HUE_GAP;
@@ -118,6 +122,7 @@ void setup()
 	app.param.effects.fire_max_bright							= EFFECT_FIRE_MAX_BRIGHT;
 	app.param.effects.fire_min_sat								= EFFECT_FIRE_MIN_SAT;
 	app.param.effects.fire_max_sat								= EFFECT_FIRE_MAX_SAT;
+	app.param.effects.pulse_anim_delay							= EFFECT_PULSE_ANIM_DELAY;
 	app.param.effects.pulse_speed								= EFFECT_PULSE_SPEED;
 	app.param.effects.pulse_step								= EFFECT_PULSE_STEP;
 
@@ -183,10 +188,18 @@ void loop()
 	ESP.wdtFeed();
 
 	static uint8_t counter = 0;
+	static uint8_t counter2 = 0;
 	
 	//Условие срабатывания по таймеру0 (1сек.)
 	if( app.flags.timer0 ){
 		app.flags.timer0 = 0;
+
+		if( counter2++ >= 7 ){
+			// app.param.effects.pulse_anim_delay = 2;
+			// app.param.effects.pulse_speed = 2;
+			if( app.param.mode == 0 ) startMode0();
+			counter2 = 0;
+		}
 
 		//Меняем состояние светодиода для индикации корректности работы
 		digitalWrite( LED_BUILTIN, !digitalRead( LED_BUILTIN ) );
@@ -243,9 +256,11 @@ void loadSettings(void)
 	uint8_t* pointer = (uint8_t*)&app.param;
 	esp::loadSettings( pointer, len );
 
+#ifdef __DEV
 	ESP_DEBUG( ">: [%u bytes] ", len );
 	esp::printHexData( pointer, len );
 	ESP_DEBUG( "\n" );
+#endif
 }
 
 //-----------------------------------------------------------------------------------------

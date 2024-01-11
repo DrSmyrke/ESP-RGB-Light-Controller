@@ -15,8 +15,11 @@ var app = {
 		zonesCount: 0,
 		zones: {},
 		effects: {
+			rainbow_anim_delay: 0,
 			rainbow_speed: 0,
 			rainbow_step: 0,
+			rainbow_orders: [],
+			fire_anim_delay: 0,
 			fire_speed: 0,
 			fire_step: 0,
 			fire_hue_gap: 0,
@@ -25,8 +28,10 @@ var app = {
 			fire_max_bright: 0,
 			fire_min_sat: 0,
 			fire_max_sat: 0,
+			pulse_anim_delay: 0,
 			pulse_speed: 0,
 			pulse_step: 0,
+			pulse_orders: [],
 			masterColor: { r: 0, g: 0, b:0 },
 			zoneColors: {},
 		},
@@ -42,7 +47,7 @@ var app = {
 		'mode', 'u_port', 'u_out', 'out', 'action', 'zone', 'effect', 'port'
 	],
 	effectIDs: [
-		'rainbow_speed', 'rainbow_step', 'fire_speed', 'fire_step', 'pulse_speed', 'pulse_step', 'masterColor', 'zoneColor'
+		'rainbow_anim_delay', 'rainbow_speed', 'rainbow_step', 'rainbow_orders', 'fire_anim_delay', 'fire_speed', 'fire_step', 'fire_hue_gap', 'fire_hue_start', 'fire_min_bright', 'fire_max_bright', 'fire_min_sat', 'fire_max_sat', 'pulse_anim_delay', 'pulse_speed', 'pulse_step', 'pulse_orders', 'masterColor', 'zonesColor', '', '', '', '', ''
 	],
 	ws: undefined,
 	wsAddr: '',
@@ -178,11 +183,13 @@ function wsOnMessage( event )
 			}
 
 			// Effects
+			app.data.effects.rainbow_anim_delay			= view.getUint8( offset++ );
 			app.data.effects.rainbow_speed				= view.getUint8( offset++ );
 			app.data.effects.rainbow_step				= view.getUint8( offset++ );
 			//rainbow_orders
 			offset += 8 * 2;
 			
+			app.data.effects.fire_anim_delay			= view.getUint8( offset++ );
 			app.data.effects.fire_speed					= view.getUint8( offset++ );
 			app.data.effects.fire_step					= view.getUint8( offset++ );
 			app.data.effects.fire_hue_gap				= view.getUint8( offset++ );
@@ -191,6 +198,7 @@ function wsOnMessage( event )
 			app.data.effects.fire_max_bright			= view.getUint8( offset++ );
 			app.data.effects.fire_min_sat				= view.getUint8( offset++ );
 			app.data.effects.fire_max_sat				= view.getUint8( offset++ );
+			app.data.effects.pulse_anim_delay			= view.getUint8( offset++ );
 			app.data.effects.pulse_speed				= view.getUint8( offset++ );
 			app.data.effects.pulse_step					= view.getUint8( offset++ );
 			//pulse_orders
@@ -208,8 +216,10 @@ function wsOnMessage( event )
 			rebuildZonesSettings();
 			updateModes();
 
+			setFieldValue( 'rainbow_anim_delay', app.data.effects.rainbow_anim_delay );
 			setFieldValue( 'rainbow_speed', app.data.effects.rainbow_speed );
 			setFieldValue( 'rainbow_step', app.data.effects.rainbow_step );
+			setFieldValue( 'fire_anim_delay', app.data.effects.fire_anim_delay );
 			setFieldValue( 'fire_speed', app.data.effects.fire_speed );
 			setFieldValue( 'fire_step', app.data.effects.fire_step );
 			setFieldValue( 'fire_hue_gap', app.data.effects.fire_hue_gap );
@@ -218,6 +228,7 @@ function wsOnMessage( event )
 			setFieldValue( 'fire_max_bright', app.data.effects.fire_max_bright );
 			setFieldValue( 'fire_min_sat', app.data.effects.fire_min_sat );
 			setFieldValue( 'fire_max_sat', app.data.effects.fire_max_sat );
+			setFieldValue( 'pulse_anim_delay', app.data.effects.pulse_anim_delay );
 			setFieldValue( 'pulse_speed', app.data.effects.pulse_speed );
 			setFieldValue( 'pulse_step', app.data.effects.pulse_step );
 			setFieldValue( 'masterColor', '#' + rgbToHex( app.data.effects.masterColor ) );
@@ -894,17 +905,56 @@ function changeEffect( element )
 	obj.name = 'effect';
 	obj.type = 'number';
 
-	if( element.name == 'rainbow_speed' ){
+
+
+	setFieldValue( '', app.data.effects.fire_hue_gap );
+	setFieldValue( '', app.data.effects.fire_hue_start );
+	setFieldValue( '', app.data.effects.fire_min_bright );
+	setFieldValue( '', app.data.effects.fire_max_bright );
+	setFieldValue( '', app.data.effects.fire_min_sat );
+	setFieldValue( '', app.data.effects.fire_max_sat );
+	setFieldValue( '', app.data.effects.pulse_anim_delay );
+	setFieldValue( '', app.data.effects.pulse_speed );
+	setFieldValue( '', app.data.effects.pulse_step );
+
+	if( element.name == 'rainbow_anim_delay' ){
+		app.data.effects.rainbow_anim_delay = element.value;
+		value.push( element.value );
+	}else if( element.name == 'rainbow_speed' ){
 		app.data.effects.rainbow_speed = element.value;
 		value.push( element.value );
 	}else if( element.name == 'rainbow_step' ){
 		app.data.effects.rainbow_step = element.value;
+		value.push( element.value );
+	}else if( element.name == 'fire_anim_delay' ){
+		app.data.effects.fire_anim_delay = element.value;
 		value.push( element.value );
 	}else if( element.name == 'fire_speed' ){
 		app.data.effects.fire_speed = element.value;
 		value.push( element.value );
 	}else if( element.name == 'fire_step' ){
 		app.data.effects.fire_step = element.value;
+		value.push( element.value );
+	}else if( element.name == 'fire_hue_gap' ){
+		app.data.effects.fire_hue_gap = element.value;
+		value.push( element.value );
+	}else if( element.name == 'fire_hue_start' ){
+		app.data.effects.fire_hue_start = element.value;
+		value.push( element.value );
+	}else if( element.name == 'fire_min_bright' ){
+		app.data.effects.fire_min_bright = element.value;
+		value.push( element.value );
+	}else if( element.name == 'fire_max_bright' ){
+		app.data.effects.fire_max_bright = element.value;
+		value.push( element.value );
+	}else if( element.name == 'fire_min_sat' ){
+		app.data.effects.fire_min_sat = element.value;
+		value.push( element.value );
+	}else if( element.name == 'fire_max_sat' ){
+		app.data.effects.fire_max_sat = element.value;
+		value.push( element.value );
+	}else if( element.name == 'pulse_anim_delay' ){
+		app.data.effects.pulse_anim_delay = element.value;
 		value.push( element.value );
 	}else if( element.name == 'pulse_speed' ){
 		app.data.effects.pulse_speed = element.value;

@@ -6,51 +6,55 @@
 //----------- FUNCTIONS--------------------------------------------------------------------
 void startMode0(void)
 {
-	if( app.param.use.port1 ){
-		app.port1[ 0 ] = CRGB( random( 0, 255 ), random( 0, 255 ), random( 0, 255 ) );
-	}
-	if( app.param.use.port2 ){
-		app.port2[ 0 ] = CRGB( random( 0, 255 ), random( 0, 255 ), random( 0, 255 ) );
-	}
-	if( app.param.use.port3 ){
-		app.port3[ 0 ] = CRGB( random( 0, 255 ), random( 0, 255 ), random( 0, 255 ) );
-	}
-	if( app.param.use.port4 ){
-		app.port4[ 0 ] = CRGB( random( 0, 255 ), random( 0, 255 ), random( 0, 255 ) );
-	}
-	if( app.param.use.port5 ){
-		app.port5[ 0 ] = CRGB( random( 0, 255 ), random( 0, 255 ), random( 0, 255 ) );
+	app.effects.pulse_current_color += COLOR_STEP;
+
+	for( uint8_t i = 0; i < LENTS_COUNT_MAX; i++ ){
+		Order order = app.param.effects.pulse_orders[ i ];
+		CRGB* port = getPortPtr( order.port );
+		uint16_t size = getPortSize( order.port );
+		uint8_t indx = ( order.dir ) ? 1 : size - 2;
+
+		if(  port != nullptr ){
+			port[ indx ] = CRGB( app.effects.pulse_current_color, 255, random( 10, 255 ) );
+			break;
+		}
 	}
 
-	m_animationCounterMax = app.param.effects.pulse_speed;
+	m_animationCounterMax = app.param.effects.pulse_anim_delay;
 	m_animationCounter = 0;
 }
 
 //-----------------------------------------------------------------------------------------
 void startMode1(void)
 {
-	if( app.param.use.port1 ) app.port1[ 0 ] = CRGB( 255, 0, 0 );
-	if( app.param.use.port2 ) app.port2[ 0 ] = CRGB( 255, 0, 0 );
-	if( app.param.use.port3 ) app.port3[ 0 ] = CRGB( 255, 0, 0 );
-	if( app.param.use.port4 ) app.port4[ 0 ] = CRGB( 255, 0, 0 );
-	if( app.param.use.port5 ) app.port5[ 0 ] = CRGB( 255, 0, 0 );
+	for( uint8_t i = 0; i < LENTS_COUNT_MAX; i++ ){
+		Order order = app.param.effects.rainbow_orders[ i ];
+		CRGB* port = getPortPtr( order.port );
+		uint16_t size = getPortSize( order.port );
+		uint8_t indx = ( order.dir ) ? 1 : size - 2;
 
-	m_animationCounterMax = app.param.effects.rainbow_speed;
+		if(  port != nullptr ){
+			port[ indx ] = CRGB( 255, 0, 0 );
+			break;
+		}
+	}
+
+	m_animationCounterMax = app.param.effects.rainbow_anim_delay;
 	m_animationCounter = 0;
 }
 
 //-----------------------------------------------------------------------------------------
 void startMode2(void)
 {
-	m_animationCounterMax = app.param.effects.fire_speed;
+	m_animationCounterMax = app.param.effects.rainbow_anim_delay;
 	m_animationCounter = 0;
 }
 
 //-----------------------------------------------------------------------------------------
 void animationStart(void)
 {
-	FastLED.clear();
-	FastLED.showColor( CRGB( 0, 0, 0 ) );
+	// Clear all
+	oneColor( 0, 0, 0 );
 	app.orderNum = 0;
 
 	/*
@@ -67,12 +71,12 @@ void animationStart(void)
 		'',
 	*/
 	switch( app.param.mode ){
-		case 1:		startMode1();			break;	//Rianbow
-		case 2:		startMode2();			break;	//Fire
-		case 3:		oneColor();				break;	//One color
-		case 4:		zonesColor();			break;	//Zones color
+		case 1:		startMode1();										break;	//Rianbow
+		case 2:		startMode2();										break;	//Fire
+		case 3:		oneColor( app.param.effects.masterColor );			break;	//One color
+		case 4:		zonesColor();										break;	//Zones color
 		case 0:
-		default:	startMode0();			break;
+		default:	startMode0();										break;
 	}
 
 	FastLED.show();
@@ -86,14 +90,61 @@ void animationProcess(void)
 		return;
 	}
 
+	if( app.orderNum >= LENTS_COUNT_MAX ) app.orderNum = 0;
+	m_animationCounterMax = 80;
+
 	switch( app.param.mode ){
-		case 0:		pulse();pulse();				break;
-		case 1:		rainbow();						break;
-		case 2:		fire();							break;
+		case 0:
+			for( uint8_t i = 0; i < app.param.effects.pulse_speed; i++) pulse();
+		break;
+		case 1:
+			for( uint8_t i = 0; i < app.param.effects.rainbow_speed; i++) rainbow();
+		break;
+		case 2:
+			for( uint8_t i = 0; i < app.param.effects.fire_speed; i++) fire();
+		break;
 	}
 	
 	m_animationCounter = m_animationCounterMax;
 	FastLED.show();
+}
+
+//-----------------------------------------------------------------------------------------
+CRGB* getPortPtr(const uint8_t portNum)
+{
+	CRGB* port = nullptr;
+
+	switch( portNum ){
+		case 1:	if( app.param.use.port1 ) port = app.port1;	break;
+		case 2:	if( app.param.use.port2 ) port = app.port2;	break;
+		case 3:	if( app.param.use.port3 ) port = app.port3;	break;
+		case 4:	if( app.param.use.port4 ) port = app.port4;	break;
+		case 5:	if( app.param.use.port5 ) port = app.port5;	break;
+		// case 6:	if( app.param.use.port6 ) port = app.port6;	break;
+		// case 7:	if( app.param.use.port7 ) port = app.port7;	break;
+		// case 8:	if( app.param.use.port8 ) port = app.port8;	break;
+	}
+
+	return port;
+}
+
+//-----------------------------------------------------------------------------------------
+uint16_t getPortSize(const uint8_t portNum)
+{
+	uint16_t size = 0;
+
+	switch( portNum ){
+		case 1:	if( app.param.use.port1 ) size = app.param.port1_size;	break;
+		case 2:	if( app.param.use.port2 ) size = app.param.port2_size;	break;
+		case 3:	if( app.param.use.port3 ) size = app.param.port3_size;	break;
+		case 4:	if( app.param.use.port4 ) size = app.param.port4_size;	break;
+		case 5:	if( app.param.use.port5 ) size = app.param.port5_size;	break;
+		// case 6:	if( app.param.use.port6 ) size = app.param.port6_size;	break;
+		// case 7:	if( app.param.use.port7 ) size = app.param.port7_size;	break;
+		// case 8:	if( app.param.use.port8 ) size = app.param.port8_size;	break;
+	}
+
+	return size;
 }
 
 //-----------------------------------------------------------------------------------------
@@ -354,18 +405,21 @@ void resetOuts(void)
 //-----------------------------------------------------------------------------------------
 void applySettings(void)
 {
+	if( app.param.effects.rainbow_anim_delay == 0 ) app.param.effects.rainbow_anim_delay = EFFECT_RAINBOW_ANIM_DELAY;
 	if( app.param.effects.rainbow_speed == 0 ) app.param.effects.rainbow_speed = EFFECT_RAINBOW_SPEED;
 	if( app.param.effects.rainbow_step == 0 ) app.param.effects.rainbow_step = EFFECT_RAINBOW_STEP;
+	if( app.param.effects.fire_anim_delay == 0 ) app.param.effects.fire_anim_delay = EFFECT_FIRE_ANIM_DELAY;
 	if( app.param.effects.fire_speed == 0 ) app.param.effects.fire_speed = EFFECT_FIRE_SPEED;
 	if( app.param.effects.fire_step == 0 ) app.param.effects.fire_step = EFFECT_FIRE_STEP;
-	if( app.param.effects.pulse_speed == 0 ) app.param.effects.pulse_speed = EFFECT_PULSE_SPEED;
-	if( app.param.effects.pulse_step == 0 ) app.param.effects.pulse_step = EFFECT_PULSE_STEP;
 	if( app.param.effects.fire_hue_gap == 0 ) app.param.effects.fire_hue_gap = EFFECT_FIRE_HUE_GAP;
 	// if( app.param.effects.fire_hue_start == 0 ) app.param.effects.fire_hue_start = EFFECT_FIRE_HUE_START;
 	if( app.param.effects.fire_min_bright == 0 ) app.param.effects.fire_min_bright = EFFECT_FIRE_MIN_BRIGHT;
 	if( app.param.effects.fire_max_bright == 0 ) app.param.effects.fire_max_bright = EFFECT_FIRE_MAX_BRIGHT;
 	if( app.param.effects.fire_min_sat == 0 ) app.param.effects.fire_min_sat = EFFECT_FIRE_MIN_SAT;
 	if( app.param.effects.fire_max_sat == 0 ) app.param.effects.fire_max_sat = EFFECT_FIRE_MAX_SAT;
+	if( app.param.effects.pulse_anim_delay == 0 ) app.param.effects.pulse_anim_delay = EFFECT_PULSE_ANIM_DELAY;
+	if( app.param.effects.pulse_speed == 0 ) app.param.effects.pulse_speed = EFFECT_PULSE_SPEED;
+	if( app.param.effects.pulse_step == 0 ) app.param.effects.pulse_step = EFFECT_PULSE_STEP;
 
 	if( app.param.port1_size > LENTA_COUNT_MAX ) app.param.port1_size = LENTA_COUNT_MAX;
 	if( app.param.port2_size > LENTA_COUNT_MAX ) app.param.port2_size = LENTA_COUNT_MAX;
@@ -494,29 +548,34 @@ void webSocketEvent(byte num, WStype_t type, uint8_t * payload, size_t length)
 									WS::Packet_effect* effect = ( WS::Packet_effect* ) payload;
 									if( length == 5 ){
 										uint16_t value = effect->data[ 0 ];
-										if( effect->effectID == 0x00 ){
-											app.param.effects.rainbow_speed = value;
-										}else if( effect->effectID == 0x01 ){
-											app.param.effects.rainbow_step = value;
-										}else if( effect->effectID == 0x02 ){
-											app.param.effects.fire_speed = value;
-										}else if( effect->effectID == 0x03 ){
-											app.param.effects.fire_step = value;
-										}else if( effect->effectID == 0x04 ){
-											app.param.effects.pulse_speed = value;
-										}else if( effect->effectID == 0x05 ){
-											app.param.effects.pulse_step = value;
+										switch( effect->effectID ){
+											case 0x00:	app.param.effects.rainbow_anim_delay = value;		break;
+											case 0x01:	app.param.effects.rainbow_speed = value;			break;
+											case 0x02:	app.param.effects.rainbow_step = value;				break;
+
+											case 0x04:	app.param.effects.fire_anim_delay = value;			break;
+											case 0x05:	app.param.effects.fire_speed = value;				break;
+											case 0x06:	app.param.effects.fire_step = value;				break;
+											case 0x07:	app.param.effects.fire_hue_gap = value;				break;
+											case 0x08:	app.param.effects.fire_hue_start = value;			break;
+											case 0x09:	app.param.effects.fire_min_bright = value;			break;
+											case 0x0A:	app.param.effects.fire_max_bright = value;			break;
+											case 0x0B:	app.param.effects.fire_min_sat = value;				break;
+											case 0x0C:	app.param.effects.fire_max_sat = value;				break;
+											case 0x0D:	app.param.effects.pulse_anim_delay = value;			break;
+											case 0x0E:	app.param.effects.pulse_speed = value;				break;
+											case 0x0F:	app.param.effects.pulse_step = value;				break;
 										}
 									}else if( length == 6 ){
-										uint16_t value = ( effect->data[ 0 ] << 8 ) | ( effect->data[ 1 ] );
+										// uint16_t value = ( effect->data[ 0 ] << 8 ) | ( effect->data[ 1 ] );
 									}else if( length == 7 ){
-										if( effect->effectID == 0x06 ){
+										if( effect->effectID == 0x11 ){
 											app.param.effects.masterColor.r = effect->data[ 0 ];
 											app.param.effects.masterColor.g = effect->data[ 1 ];
 											app.param.effects.masterColor.b = effect->data[ 2 ];
 										}
 									}else if( length == 8 ){
-										if( effect->effectID == 0x07 ){
+										if( effect->effectID == 0x12 ){
 											uint8_t zoneID = effect->data[ 0 ];
 											if( zoneID < ZONES_MAX ){
 												app.param.effects.zonesColor[ zoneID ].r = effect->data[ 1 ];
@@ -573,6 +632,36 @@ void webSocketEvent(byte num, WStype_t type, uint8_t * payload, size_t length)
 				}
 			}
 		break;
+	}
+}
+
+//-----------------------------------------------------------------------------------------
+void moveColorAtNextPort(uint8_t oIndx, const struct Order* ordersList, const CRGB* color, const uint16_t offset, const uint8_t repeat)
+{
+	oIndx++;
+
+	if( oIndx >= LENTS_COUNT_MAX ){
+		if( repeat ){
+			oIndx = 0;
+		}else{
+			return;
+		}
+	}
+
+	const Order* nextOrder = &ordersList[ oIndx ];
+	if( nextOrder->port == 0 ){
+		moveColorAtNextPort( oIndx, ordersList, color, offset, repeat );
+		return;
+	}
+
+	CRGB* nextPort = getPortPtr( nextOrder->port );
+	uint16_t nextSize = getPortSize( nextOrder->port );
+	if(  nextPort != nullptr ){
+		uint16_t indx = ( nextOrder->dir ) ? offset : ( nextSize - 1 - offset );
+		if( indx > nextSize ) indx = nextSize - 1;
+		nextPort[ indx ] = *color;
+	}else{
+		moveColorAtNextPort( oIndx, ordersList, color, offset, repeat );
 	}
 }
 

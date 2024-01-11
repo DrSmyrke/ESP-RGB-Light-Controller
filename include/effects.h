@@ -8,15 +8,21 @@
 
 
 //----------- DEFINES ---------------------------------------------------------------------
+#ifndef EFFECT_RAINBOW_ANIM_DELAY
+	#define EFFECT_RAINBOW_ANIM_DELAY									4
+#endif
 #ifndef EFFECT_RAINBOW_SPEED
-	#define EFFECT_RAINBOW_SPEED										32
+	#define EFFECT_RAINBOW_SPEED										12
 #endif
 #ifndef EFFECT_RAINBOW_STEP
-	#define EFFECT_RAINBOW_STEP											25
+	#define EFFECT_RAINBOW_STEP											2
 #endif
 
+#ifndef EFFECT_FIRE_ANIM_DELAY
+	#define EFFECT_FIRE_ANIM_DELAY										4
+#endif
 #ifndef EFFECT_FIRE_SPEED
-	#define EFFECT_FIRE_SPEED											8
+	#define EFFECT_FIRE_SPEED											1
 #endif
 #ifndef EFFECT_FIRE_STEP
 	#define EFFECT_FIRE_STEP											15
@@ -40,12 +46,17 @@
 	#define EFFECT_FIRE_MAX_SAT											255				 // макс. насыщенность
 #endif
 
+#ifndef EFFECT_PULSE_ANIM_DELAY
+	#define EFFECT_PULSE_ANIM_DELAY										4
+#endif
 #ifndef EFFECT_PULSE_SPEED
 	#define EFFECT_PULSE_SPEED											4
 #endif
 #ifndef EFFECT_PULSE_STEP
-	#define EFFECT_PULSE_STEP											3
+	#define EFFECT_PULSE_STEP											20
 #endif
+
+#define COLOR_STEP														151  // шаг цвета, интересные 151, 129
 
 //----------- STRUCTURES ------------------------------------------------------------------
 struct HSV
@@ -63,10 +74,12 @@ struct HSV
 void pulse(void);
 void rainbow(void);
 void fire(void);
-void oneColor(void);
+void oneColor(const CRGB &color);
+void oneColor(const struct Color &color);
+void oneColor(const uint8_t r, const uint8_t g, const uint8_t b);
 void zonesColor(void);
 
-CRGB getNexLedRianbow(CRGB pixel, const uint8_t topValue);
+CRGB getNexLedRianbow(CRGB &pixel, const uint8_t topValue);
 void setFireColor(CRGB *led, const uint16_t indx, const uint32_t counter);
 HSV rgbToHSV(CRGB &pixel);
 //-----------------------------------------------------------------------------------------

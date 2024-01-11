@@ -10,82 +10,52 @@ uint32_t fire_counter = 0;
 //----------- FUNCTIONS--------------------------------------------------------------------
 void pulse(void)
 {
-	if( app.param.use.port1 ){
-		for( uint16_t i = app.param.port1_size - 1; i > 0; i-- ){
-			CRGB color_prew = app.port1[ i - 1 ];
-			if( color_prew.r != 0 || color_prew.g != 0 || color_prew.b != 0 ){
-				app.port1[ i ] = color_prew;
-				HSV hsv = rgbToHSV( color_prew );
-				if( hsv.v > app.param.effects.pulse_step ) hsv.v -= app.param.effects.pulse_step;
-				if( hsv.v < app.param.effects.pulse_step ) hsv.v = 0;
-				color_prew.setHSV( hsv.h, hsv.s, hsv.v );
-				app.port1[ i - 1 ] = color_prew;
+	app.param.effects.pulse_step = 20;
+
+	for( uint8_t oIndx = 0; oIndx < LENTS_COUNT_MAX; oIndx++ ){
+		Order order = app.param.effects.pulse_orders[ oIndx ];
+		CRGB* port = getPortPtr( order.port );
+		uint16_t size = getPortSize( order.port );
+
+		if(  port != nullptr ){
+			if( order.dir ){
+				uint16_t j = size - 1;
+				// Move current led at next port
+				CRGB* color_cur = &port[ j ];
+				if( color_cur->r != 0 || color_cur->g != 0 || color_cur->b != 0 ){
+					moveColorAtNextPort( oIndx, app.param.effects.pulse_orders, color_cur, 1, 0 );
+				}
+
+				while( j ){
+					CRGB color_cur = port[ j ];
+					CRGB color_prew = port[ j - 1 ];
+					if( color_cur.r >= app.param.effects.pulse_step ) color_prew.r = color_cur.r - app.param.effects.pulse_step;
+					if( color_cur.g >= app.param.effects.pulse_step ) color_prew.g = color_cur.g - app.param.effects.pulse_step;
+					if( color_cur.b >= app.param.effects.pulse_step ) color_prew.b = color_cur.b - app.param.effects.pulse_step;
+					if( color_prew.r < app.param.effects.pulse_step ) color_prew.r = 0;
+					if( color_prew.g < app.param.effects.pulse_step ) color_prew.g = 0;
+					if( color_prew.b < app.param.effects.pulse_step ) color_prew.b = 0;
+					port[ j ] = color_prew;
+					j--;
+				}
 			}else{
-				if( i == ( app.param.port1_size - 1 ) ) app.port1[ i ] = color_prew;
-			}
-		}
-	}
-	
-	if( app.param.use.port2 ){
-		for( uint16_t i = app.param.port2_size - 1; i > 0; i-- ){
-			CRGB color_prew = app.port2[ i - 1 ];
-			if( color_prew.r != 0 || color_prew.g != 0 || color_prew.b != 0 ){
-				app.port2[ i ] = color_prew;
-				HSV hsv = rgbToHSV( color_prew );
-				if( hsv.v > app.param.effects.pulse_step ) hsv.v -= app.param.effects.pulse_step;
-				if( hsv.v < app.param.effects.pulse_step ) hsv.v = 0;
-				color_prew.setHSV( hsv.h, hsv.s, hsv.v );
-				app.port2[ i - 1 ] = color_prew;
-			}else{
-				if( i == ( app.param.port2_size - 1 ) ) app.port2[ i ] = color_prew;
-			}
-		}
-	}
-	
-	if( app.param.use.port3 ){
-		for( uint16_t i = app.param.port3_size - 1; i > 0; i-- ){
-			CRGB color_prew = app.port3[ i - 1 ];
-			if( color_prew.r != 0 || color_prew.g != 0 || color_prew.b != 0 ){
-				app.port3[ i ] = color_prew;
-				HSV hsv = rgbToHSV( color_prew );
-				if( hsv.v > app.param.effects.pulse_step ) hsv.v -= app.param.effects.pulse_step;
-				if( hsv.v < app.param.effects.pulse_step ) hsv.v = 0;
-				color_prew.setHSV( hsv.h, hsv.s, hsv.v );
-				app.port3[ i - 1 ] = color_prew;
-			}else{
-				if( i == ( app.param.port3_size - 1 ) ) app.port3[ i ] = color_prew;
-			}
-		}
-	}
-	
-	if( app.param.use.port4 ){
-		for( uint16_t i = app.param.port4_size - 1; i > 0; i-- ){
-			CRGB color_prew = app.port4[ i - 1 ];
-			if( color_prew.r != 0 || color_prew.g != 0 || color_prew.b != 0 ){
-				app.port4[ i ] = color_prew;
-				HSV hsv = rgbToHSV( color_prew );
-				if( hsv.v > app.param.effects.pulse_step ) hsv.v -= app.param.effects.pulse_step;
-				if( hsv.v < app.param.effects.pulse_step ) hsv.v = 0;
-				color_prew.setHSV( hsv.h, hsv.s, hsv.v );
-				app.port4[ i - 1 ] = color_prew;
-			}else{
-				if( i == ( app.param.port4_size - 1 ) ) app.port4[ i ] = color_prew;
-			}
-		}
-	}
-	
-	if( app.param.use.port5 ){
-		for( uint16_t i = app.param.port5_size - 1; i > 0; i-- ){
-			CRGB color_prew = app.port5[ i - 1 ];
-			if( color_prew.r != 0 || color_prew.g != 0 || color_prew.b != 0 ){
-				app.port5[ i ] = color_prew;
-				HSV hsv = rgbToHSV( color_prew );
-				if( hsv.v > app.param.effects.pulse_step ) hsv.v -= app.param.effects.pulse_step;
-				if( hsv.v < app.param.effects.pulse_step ) hsv.v = 0;
-				color_prew.setHSV( hsv.h, hsv.s, hsv.v );
-				app.port5[ i - 1 ] = color_prew;
-			}else{
-				if( i == ( app.param.port5_size - 1 ) ) app.port5[ i ] = color_prew;
+				// Move current led at next port
+				CRGB* color_cur = &port[ 0 ];
+				if( color_cur->r != 0 || color_cur->g != 0 || color_cur->b != 0 ){
+					moveColorAtNextPort( oIndx, app.param.effects.pulse_orders, color_cur, 1, 0 );
+				}
+
+				for( uint16_t i = 0; i < size - 1; i++ ){
+					CRGB color_cur = port[ i ];
+					CRGB color_prew = port[ i + 1 ];
+					if( color_cur.r >= app.param.effects.pulse_step ) color_prew.r = color_cur.r - app.param.effects.pulse_step;
+					if( color_cur.g >= app.param.effects.pulse_step ) color_prew.g = color_cur.g - app.param.effects.pulse_step;
+					if( color_cur.b >= app.param.effects.pulse_step ) color_prew.b = color_cur.b - app.param.effects.pulse_step;
+					if( color_prew.r < app.param.effects.pulse_step ) color_prew.r = 0;
+					if( color_prew.g < app.param.effects.pulse_step ) color_prew.g = 0;
+					if( color_prew.b < app.param.effects.pulse_step ) color_prew.b = 0;
+					port[ i ] = color_prew;
+				}
 			}
 		}
 	}
@@ -96,59 +66,37 @@ void rainbow(void)
 {
 	uint8_t topValue = ( 255 - app.param.effects.rainbow_step );
 	
-	for( uint8_t i = 0; i < LENTS_COUNT_MAX; i++ ){
-		Order order = app.param.effects.rainbow_orders[ i ];
-		CRGB* port = nullptr;
-		uint16_t size = 0;
-		switch( order.port ){
-			case 1:
-				if( app.param.use.port1 ){
-					port = app.port1;
-					size = app.param.port1_size;
-				}
-			break;
-			case 2:
-				if( app.param.use.port2 ){
-					port = app.port2;
-					size = app.param.port2_size;
-				}
-			break;
-			case 3:
-				if( app.param.use.port3 ){
-					port = app.port3;
-					size = app.param.port3_size;
-				}
-			break;
-			case 4:
-				if( app.param.use.port4 ){
-					port = app.port4;
-					size = app.param.port4_size;
-				}
-			break;
-			case 5:
-				if( app.param.use.port5 ){
-					port = app.port5;
-					size = app.param.port5_size;
-				}
-			break;
-		}
+	for( uint8_t oIndx = 0; oIndx < LENTS_COUNT_MAX; oIndx++ ){
+		Order order = app.param.effects.rainbow_orders[ oIndx ];
+		CRGB* port = getPortPtr( order.port );
+		uint16_t size = getPortSize( order.port );
 
 		if(  port != nullptr ){
 			if( order.dir ){
-				for( uint16_t i = 0; i < size; i++ ){
-					CRGB color_cur = port[ i ];
-					if( color_cur.r == 0 && color_cur.g == 0 && color_cur.b == 0 ) continue;
-					uint16_t nextIndx = i + 1;
-					if( nextIndx >= size ) nextIndx = 0;
-					port[ nextIndx ] = getNexLedRianbow( color_cur, topValue );
+				uint16_t j = size - 1;
+				// Move current led at next port
+				CRGB* color_cur = &port[ j ];
+				if( color_cur->r != 0 || color_cur->g != 0 || color_cur->b != 0 ){
+					moveColorAtNextPort( oIndx, app.param.effects.rainbow_orders, color_cur, 1, 0 );
+				}
+				while( j ){
+					CRGB color_cur = port[ j ];
+					CRGB color_prew = port[ j - 1 ];
+					if( color_prew.r == 0 && color_prew.g == 0 && color_prew.b == 0 ) color_prew = getNexLedRianbow( color_cur, topValue );
+					port[ j ] = color_prew;
+					port[ j - 1 ] = getNexLedRianbow( color_cur, topValue );
+					j--;
 				}
 			}else{
-				for( uint16_t i = size - 1; i >= 0; i-- ){
+				// Move current led at next port
+				CRGB* color_cur = &port[ 0 ];
+				if( color_cur->r != 0 || color_cur->g != 0 || color_cur->b != 0 ){
+					moveColorAtNextPort( oIndx, app.param.effects.rainbow_orders, color_cur, 1, 0 );
+				}
+				for( uint16_t i = 0; i < size - 1; i++ ){
 					CRGB color_cur = port[ i ];
-					if( color_cur.r == 0 && color_cur.g == 0 && color_cur.b == 0 ) continue;
-					uint16_t nextIndx = i - 1;
-					if( i == 0 ) nextIndx = size;
-					port[ nextIndx ] = getNexLedRianbow( color_cur, topValue );
+					CRGB color_prew = port[ i + 1 ];
+					port[ i ] = color_prew;
 				}
 			}
 		}
@@ -188,29 +136,57 @@ void fire(void)
 		}
 		fire_counter += 20;
 	}
-
-	FastLED.show();
 }
 
+//-----------------------------------------------------------------------------------------
+void oneColor(const CRGB &color)
+{
+	oneColor( color.r, color.g, color.b );
+}
 
 //-----------------------------------------------------------------------------------------
-void oneColor(void)
+void oneColor(const struct Color &color)
 {
-	CRGB color = CRGB( app.param.effects.masterColor.r, app.param.effects.masterColor.g, app.param.effects.masterColor.b );
+	oneColor( color.r, color.g, color.b );
+}
+
+//-----------------------------------------------------------------------------------------
+void oneColor(const uint8_t r, const uint8_t g, const uint8_t b)
+{
 	if( app.param.use.port1 ){
-		for( uint16_t i = 0; i < app.param.port1_size; i++ ) app.port1[ i ] = color;
+		for( uint16_t i = 0; i < app.param.port1_size; i++ ){
+			app.port1[ i ].r = r;
+			app.port1[ i ].g = g;
+			app.port1[ i ].b = b;
+		}
 	}
 	if( app.param.use.port2 ){
-		for( uint16_t i = 0; i < app.param.port2_size; i++ ) app.port2[ i ] = color;
+		for( uint16_t i = 0; i < app.param.port2_size; i++ ){
+			app.port2[ i ].r = r;
+			app.port2[ i ].g = g;
+			app.port2[ i ].b = b;
+		}
 	}
 	if( app.param.use.port3 ){
-		for( uint16_t i = 0; i < app.param.port3_size; i++ ) app.port3[ i ] = color;
+		for( uint16_t i = 0; i < app.param.port3_size; i++ ){
+			app.port3[ i ].r = r;
+			app.port3[ i ].g = g;
+			app.port3[ i ].b = b;
+		}
 	}
 	if( app.param.use.port4 ){
-		for( uint16_t i = 0; i < app.param.port4_size; i++ ) app.port4[ i ] = color;
+		for( uint16_t i = 0; i < app.param.port4_size; i++ ){
+			app.port4[ i ].r = r;
+			app.port4[ i ].g = g;
+			app.port4[ i ].b = b;
+		}
 	}
 	if( app.param.use.port5 ){
-		for( uint16_t i = 0; i < app.param.port5_size; i++ ) app.port5[ i ] = color;
+		for( uint16_t i = 0; i < app.param.port5_size; i++ ){
+			app.port5[ i ].r = r;
+			app.port5[ i ].g = g;
+			app.port5[ i ].b = b;
+		}
 	}
 }
 
@@ -240,7 +216,7 @@ void zonesColor(void)
 
 //-----------------------------------------------------------------------------------------
 //-----------------------------------------------------------------------------------------
-CRGB getNexLedRianbow(CRGB pixel, const uint8_t topValue)
+CRGB getNexLedRianbow(CRGB &pixel, const uint8_t topValue)
 {
 	if( pixel.r == 255 && pixel.b == 0 ){
 		if( pixel.g <= topValue ) pixel.g += app.param.effects.rainbow_step;
