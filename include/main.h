@@ -70,7 +70,7 @@ namespace WS{
 		Header header;
 		uint8_t effectID;
 		uint8_t dataLen;
-		uint8_t data[ 12 ];
+		uint8_t data[ 16 ];
 	};
 	struct Packet_portSize{
 		Header header;

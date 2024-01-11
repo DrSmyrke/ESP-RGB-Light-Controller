@@ -583,6 +583,14 @@ void webSocketEvent(byte num, WStype_t type, uint8_t * payload, size_t length)
 												app.param.effects.zonesColor[ zoneID ].b = effect->data[ 3 ];
 											}
 										}
+									}else if( length == 20 ){
+										if( effect->effectID == 0x03 ){
+											uint8_t* ptr = (uint8_t*)app.param.effects.rainbow_orders;
+											memcpy( ptr, effect->data, sizeof( app.param.effects.rainbow_orders ) );
+										}else if( effect->effectID == 0x10 ){
+											uint8_t* ptr = (uint8_t*)app.param.effects.pulse_orders;
+											memcpy( ptr, effect->data, sizeof( app.param.effects.pulse_orders ) );
+										}
 									}
 									animationStart();
 								}
