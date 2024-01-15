@@ -200,16 +200,11 @@ void zonesColor(void)
 		CRGB color = CRGB( app.param.effects.zonesColor[ i ].r, app.param.effects.zonesColor[ i ].g, app.param.effects.zonesColor[ i ].b );
 		uint16_t finalPos = zone->start + zone->count;
 
-		if( zone->port == 1 && app.param.use.port1 && finalPos <= app.param.port1_size ){
-			for( uint16_t j = zone->start; j < finalPos; j++ ) app.port1[ j ] = color;
-		}else if( zone->port == 2 && app.param.use.port2 && finalPos <= app.param.port2_size ){
-			for( uint16_t j = zone->start; j < finalPos; j++ ) app.port2[ j ] = color;
-		}else if( zone->port == 3 && app.param.use.port3 && finalPos <= app.param.port3_size ){
-			for( uint16_t j = zone->start; j < finalPos; j++ ) app.port3[ j ] = color;
-		}else if( zone->port == 4 && app.param.use.port4 && finalPos <= app.param.port4_size ){
-			for( uint16_t j = zone->start; j < finalPos; j++ ) app.port4[ j ] = color;
-		}else if( zone->port == 5 && app.param.use.port5 && finalPos <= app.param.port5_size ){
-			for( uint16_t j = zone->start; j < finalPos; j++ ) app.port5[ j ] = color;
+		CRGB* port = getPortPtr( zone->port );
+		uint16_t size = getPortSize( zone->port );
+
+		if(  port != nullptr && finalPos <= size ){
+			for( uint16_t j = zone->start; j < finalPos; j++ ) port[ j ] = color;
 		}
 	}
 }

@@ -4,13 +4,13 @@
 AppData app;
 ESP8266WebServer webServer( 80 );
 WebSocketsServer webSocket( 81 );
-Timer timer0( 0, 1000, timer0Interrupt );
-Timer timer1( 0, 2, timer1Interrupt );
+Timer timer0( 0, 1000, [](void*){ app.flags.timer0 = 1; } );
+Timer timer1( 0, 1, [](void*){ app.flags.timer1 = 1; } );
 
 // CRGB leds2[ LENTA2_COUNT ];
 // Adafruit_NeoPixel port1( LENTA1_COUNT, LENTA2_PIN, NEO_GRB + NEO_KHZ800 );
 // Adafruit_NeoPixel port2( LENTA2_COUNT, LENTA2_PIN, NEO_GRB + NEO_KHZ800 );
-// Adafruit_NeoPixel port3( LENTA3_COUNT, LENTA3_PIN, NEO_GRB + NEO_KHZ800 );
+// Adafruit_NeoPъxel port3( LENTA3_COUNT, LENTA3_PIN, NEO_GRB + NEO_KHZ800 );
 // Adafruit_NeoPixel port4( LENTA4_COUNT, LENTA4_PIN, NEO_GRB + NEO_KHZ800 );
 // Adafruit_NeoPixel port5( LENTA5_COUNT, LENTA5_PIN, NEO_GRB + NEO_KHZ800 );
 
@@ -45,6 +45,7 @@ void setup()
 	app.port4													= nullptr;
 	app.port5													= nullptr;
 	app.orderNum												= 0;
+	app.saveSettingsCounter										= 0;
 
 	app.effects.pulse_current_color								= 0;
 
@@ -206,11 +207,18 @@ void loop()
 // #ifdef __DEV
 // 		ESP_DEBUG( "FREE: %u / 81920\n", ESP.getFreeHeap() );
 // #endif
+
+		if( app.saveSettingsCounter ){
+			app.saveSettingsCounter--;
+			if( app.saveSettingsCounter == 0 ) saveSettings();
+		}
 	}
 
 	//Условие срабатывания по таймеру1
 	if( app.flags.timer1 ){
 		app.flags.timer1 = 0;
+
+		animationProcess();
 
 		if( !esp::isWiFiConnection() ){
 			if( counter++ >= 40 ){
@@ -218,26 +226,12 @@ void loop()
 				counter = 0;
 			}
 		}
-
-		animationProcess();
 	}
 
 	
 
 	webSocket.loop();
 	webServer.handleClient();
-}
-
-//-----------------------------------------------------------------------------------------
-void timer0Interrupt(void*)
-{
-	app.flags.timer0 = 1;
-}
-
-//-----------------------------------------------------------------------------------------
-void timer1Interrupt(void*)
-{
-	app.flags.timer1 = 1;
 }
 
 //-----------------------------------------------------------------------------------------

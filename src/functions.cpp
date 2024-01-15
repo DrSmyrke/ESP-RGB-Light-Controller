@@ -106,6 +106,7 @@ void animationProcess(void)
 	}
 	
 	m_animationCounter = m_animationCounterMax;
+
 	FastLED.show();
 }
 
@@ -455,6 +456,8 @@ void applySettings(void)
 	app.port5 = (CRGB*)malloc( app.param.port5_size * sizeof( CRGB ) );
 	FastLED.addLeds<NEOPIXEL, LENTA5_PIN>( app.port5, app.param.port5_size );
 #endif
+
+	// FastLED.setMaxRefreshRate( 60, false );
 	
 	FastLED.clear();
 	resetOuts();
@@ -495,7 +498,7 @@ void webSocketEvent(byte num, WStype_t type, uint8_t * payload, size_t length)
 								case 0x00:		// device mode	(1 byte)
 									app.param.mode = payload[ 2 ];
 									animationStart();
-									saveSettings();
+									app.saveSettingsCounter = SAVE_SETTINGS_COUNTER_MAX;
 								break;
 								case 0x01:		// use ports	(1 byte)
 									if( length >= 3 ){
@@ -527,7 +530,7 @@ void webSocketEvent(byte num, WStype_t type, uint8_t * payload, size_t length)
 											ESP.restart();
 										break;
 										case 0x02:		// save
-											saveSettings();
+											app.saveSettingsCounter = SAVE_SETTINGS_COUNTER_MAX;
 										break;
 									}
 								}
@@ -540,6 +543,7 @@ void webSocketEvent(byte num, WStype_t type, uint8_t * payload, size_t length)
 										app.param.zones[ zone->zoneNum ].start = ( zone->start[ 0 ] << 8 ) | zone->start[ 1 ];
 										app.param.zones[ zone->zoneNum ].count = ( zone->count[ 0 ] << 8 ) | zone->count[ 1 ];
 										if( app.param.mode == 4 ) animationStart();
+										app.saveSettingsCounter = SAVE_SETTINGS_COUNTER_MAX;
 									}
 								}
 								break;

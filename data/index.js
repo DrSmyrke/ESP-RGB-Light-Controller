@@ -187,7 +187,11 @@ function wsOnMessage( event )
 			app.data.effects.rainbow_speed				= view.getUint8( offset++ );
 			app.data.effects.rainbow_step				= view.getUint8( offset++ );
 			//rainbow_orders
-			offset += 8 * 2;
+			app.data.effects.rainbow_orders				= [];
+			for( let i = 0; i < 8; i++ ){
+				app.data.effects.rainbow_orders.push( view.getUint8( offset++ ) );		//Port
+				app.data.effects.rainbow_orders.push( view.getUint8( offset++ ) );		//Direction
+			}
 			
 			app.data.effects.fire_anim_delay			= view.getUint8( offset++ );
 			app.data.effects.fire_speed					= view.getUint8( offset++ );
@@ -202,7 +206,11 @@ function wsOnMessage( event )
 			app.data.effects.pulse_speed				= view.getUint8( offset++ );
 			app.data.effects.pulse_step					= view.getUint8( offset++ );
 			//pulse_orders
-			offset += 8 * 2;
+			app.data.effects.pulse_orders				= [];
+			for( let i = 0; i < 8; i++ ){
+				app.data.effects.pulse_orders.push( view.getUint8( offset++ ) );			//Port
+				app.data.effects.pulse_orders.push( view.getUint8( offset++ ) );			//Direction
+			}
 
 			app.data.effects.masterColor.r				= view.getUint8( offset++ );
 			app.data.effects.masterColor.g				= view.getUint8( offset++ );
@@ -219,6 +227,7 @@ function wsOnMessage( event )
 			setFieldValue( 'rainbow_anim_delay', app.data.effects.rainbow_anim_delay );
 			setFieldValue( 'rainbow_speed', app.data.effects.rainbow_speed );
 			setFieldValue( 'rainbow_step', app.data.effects.rainbow_step );
+			setFieldValue( 'rainbow_orders', app.data.effects.rainbow_orders.join( ',' ) );
 			setFieldValue( 'fire_anim_delay', app.data.effects.fire_anim_delay );
 			setFieldValue( 'fire_speed', app.data.effects.fire_speed );
 			setFieldValue( 'fire_step', app.data.effects.fire_step );
@@ -231,6 +240,7 @@ function wsOnMessage( event )
 			setFieldValue( 'pulse_anim_delay', app.data.effects.pulse_anim_delay );
 			setFieldValue( 'pulse_speed', app.data.effects.pulse_speed );
 			setFieldValue( 'pulse_step', app.data.effects.pulse_step );
+			setFieldValue( 'pulse_orders', app.data.effects.pulse_orders.join( ',' ) );
 			setFieldValue( 'masterColor', '#' + rgbToHex( app.data.effects.masterColor ) );
 
 			// offset += settings_size;
@@ -905,18 +915,6 @@ function changeEffect( element )
 	obj.name = 'effect';
 	obj.type = 'number';
 
-
-
-	setFieldValue( '', app.data.effects.fire_hue_gap );
-	setFieldValue( '', app.data.effects.fire_hue_start );
-	setFieldValue( '', app.data.effects.fire_min_bright );
-	setFieldValue( '', app.data.effects.fire_max_bright );
-	setFieldValue( '', app.data.effects.fire_min_sat );
-	setFieldValue( '', app.data.effects.fire_max_sat );
-	setFieldValue( '', app.data.effects.pulse_anim_delay );
-	setFieldValue( '', app.data.effects.pulse_speed );
-	setFieldValue( '', app.data.effects.pulse_step );
-
 	if( element.name == 'rainbow_anim_delay' ){
 		app.data.effects.rainbow_anim_delay = element.value;
 		value.push( element.value );
@@ -974,6 +972,18 @@ function changeEffect( element )
 		value.push( rgb.r );
 		value.push( rgb.g );
 		value.push( rgb.b );
+	}else if( element.name == 'rainbow_orders' ){
+		let list = element.value.split( ',' );
+		if( list.length == 16 ){
+			for( let i = 0; i < list.length; i++ ) value.push( list[ i ] );
+		}
+		app.data.effects.rainbow_orders = list;
+	}else if( element.name == 'pulse_orders' ){
+		let list = element.value.split( ',' );
+		if( list.length == 16 ){
+			for( let i = 0; i < list.length; i++ ) value.push( list[ i ] );
+		}
+		app.data.effects.pulse_orders = list;
 	}
 	
 	let effectID = 0xFF;

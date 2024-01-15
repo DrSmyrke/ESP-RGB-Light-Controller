@@ -36,6 +36,7 @@
 #define ZONES_MAX												25
 #define DEFAULT_BRIGHTNESS										37
 #define MAX_BRIGHTNESS											255
+#define SAVE_SETTINGS_COUNTER_MAX								30
 
 #define setPlus(reg,bit) reg |= (1<<bit)
 #define setZero(reg,bit) reg &= ~(1<<bit)
@@ -110,6 +111,8 @@ struct AppData{
 	CRGB *port3;
 	CRGB *port4;
 	CRGB *port5;
+
+	uint8_t saveSettingsCounter;
 
 	uint8_t orderNum;
 	struct{
@@ -195,8 +198,6 @@ extern uint16_t m_animationCounter;
 extern uint16_t m_animationCounterMax;
 
 //----------- FUNCTIONS--------------------------------------------------------------------
-void timer0Interrupt(void*);
-void timer1Interrupt(void*);
 void saveSettings(void);
 void loadSettings(void);
 
