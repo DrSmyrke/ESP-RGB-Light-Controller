@@ -47,7 +47,7 @@ var app = {
 		'mode', 'u_port', 'u_out', 'out', 'action', 'zone', 'effect', 'port'
 	],
 	effectIDs: [
-		'rainbow_anim_delay', 'rainbow_speed', 'rainbow_step', 'rainbow_orders', 'fire_anim_delay', 'fire_speed', 'fire_step', 'fire_hue_gap', 'fire_hue_start', 'fire_min_bright', 'fire_max_bright', 'fire_min_sat', 'fire_max_sat', 'pulse_anim_delay', 'pulse_speed', 'pulse_step', 'pulse_orders', 'masterColor', 'zonesColor', '', '', '', '', ''
+		'rainbow_anim_delay', 'rainbow_speed', 'rainbow_step', 'rainbow_orders', 'fire_anim_delay', 'fire_speed', 'fire_step', 'fire_hue_gap', 'fire_hue_start', 'fire_min_bright', 'fire_max_bright', 'fire_min_sat', 'fire_max_sat', 'pulse_anim_delay', 'pulse_speed', 'pulse_step', 'pulse_orders', 'masterColor', 'zoneColor', '', '', '', '', ''
 	],
 	ws: undefined,
 	wsAddr: '',
@@ -57,13 +57,14 @@ var app = {
 
 //-----------------------------------------------------------------------------
 window.onload = function(){
+	app.localStorage = new Storage( false );
+
 	printLocation();
 	buildControlUI();
 	buildSettingsUI();
+	updateGroupsUI();
 	buildModes();
 	updateModes();
-
-	app.localStorage = new Storage( false );
 
 	let data = app.localStorage.getStorageData( 'settings', '{}' );
 	//
@@ -288,7 +289,7 @@ function openPage( url = '' )
 	let title			= '';
 	let cb				= document.getElementById( 'controlBox' );
 	let sb				= document.getElementById( 'settingsBox' );
-	let zb				= document.getElementById( 'zonesBox' );
+	let zb				= document.getElementById( 'zonesGroupsBox' );
 	let eb				= document.getElementById( 'effectsBox' );
 
 	if( cb != undefined ) cb.classList.add( 'hidden' );
@@ -635,11 +636,10 @@ function rebuildInputsOutsSettings()
 //-----------------------------------------------------------------------------
 function rebuildZonesSettings()
 {
-	let obj = document.getElementById( 'zonesBox' );
-	if( obj != undefined ) obj = obj.lastElementChild;
-	if( obj == undefined ) return;
+	let zb = document.getElementById( 'zonesBox' );
+	if( zb == undefined ) return;
 
-	obj.innerHTML = '';
+	zb.innerHTML = '';
 
 	for( let i = 0; i < app.data.zonesCount; i++ ){
 		if( !app.data.zones.hasOwnProperty( i ) ) continue;
@@ -647,7 +647,7 @@ function rebuildZonesSettings()
 		let start						= app.data.zones[ i ].start;
 		let count						= app.data.zones[ i ].count;
 		let color						= app.data.effects.zoneColors[ i ];
-		let name						= 'Zone ' + ( i + 1 );
+		let name						= '# ' + ( i + 1 );
 
 		if( color == undefined ) color = { r: 0, g: 0, b: 0 };
 
@@ -655,7 +655,96 @@ function rebuildZonesSettings()
 		div.className = 'flex';
 		div.innerHTML = '<input type="number" min="0" max="8" name="portAtZone" lang="' + i + '" onchange="changeZone( this );" value="' + port + '" size="3"><input type="number" min="0" max="9999" name="startAtZone" lang="' + i + '" onchange="changeZone( this );" value="' + start + '" size="5"><input type="number" min="0" max="9999" name="countAtZone" lang="' + i + '" onchange="changeZone( this );" value="' + count + '" size="5"><input type="color" name="zoneColor" value="#' + rgbToHex( color ) + '" lang="' + i + '" onChange="changeEffect( this );">';
 
-		addString( obj, name, div );
+		addString( zb, name, div );
+	}
+}
+
+//-----------------------------------------------------------------------------
+function updateGroupsUI()
+{
+	let gb = document.getElementById( 'groupsBox' );
+	if( gb == undefined ) return;
+
+	gb.innerHTML = '';
+
+	let data = app.localStorage.getStorageData( 'groups', '{}' );
+	for( let name in data ){
+		let zones = data[ name ];
+		let string = document.createElement( 'div' );
+		string.className = 'string';
+		let text = document.createElement( 'text' );
+		text.innerText = name;
+		string.appendChild( text );
+		let div = document.createElement( 'div' );
+		div.className = 'flex';
+		div.innerHTML = '<input type="button" value="R" lang="' + name + '" onClick="removeGroup( this );"> | <input type="color" name="groupColor" lang="' + name + '" onChange="setGroupColor( this );">';
+		string.appendChild( div );
+		gb.appendChild( string );
+	}
+
+
+	//Делаем добавлялку группы
+	let div = document.createElement( 'div' );
+	div.className = 'string';
+	div.innerHTML = '<input type="text" placeholder="Zone id,Zone id,..." name="newZone"><input type="button" value="Create group" onClick="newGroup();">';
+	gb.appendChild( div );
+}
+
+//-----------------------------------------------------------------------------
+function removeGroup( element )
+{
+	if( element == undefined ) return;
+	if( app.debug ) console.log( 'removeGroup >:', element );
+	let groupName = element.lang;
+
+	if( !confirm( 'Are you sure to delete group: ' + groupName + '?' ) ) return;
+
+	app.localStorage.removeFromStorage( 'groups', groupName );
+	updateGroupsUI();
+}
+
+//-----------------------------------------------------------------------------
+function setGroupColor( element )
+{
+	if( app.debug ) console.log( 'setGroupColor >:', element );
+
+	if( element == undefined ) return;
+	let groupName = element.lang;
+	let data = app.localStorage.getStorageData( 'groups', '{}' );
+	let groupData = data[ groupName ];
+	if( groupData == undefined ) return;
+
+	for( let indx in groupData ){
+		let zone = Number( groupData[ indx ] );
+		let ie = document.createElement( 'input' );
+		ie.type = 'color';
+		ie.name = 'zoneColor';
+		ie.value = element.value;
+		ie.lang = zone;
+		changeEffect( ie );
+		ie.remove();
+
+		app.data.effects.zoneColors[ zone ] = hexToRgb( element.value );
+		updateGroupsUI();
+	}
+}
+
+//-----------------------------------------------------------------------------
+function newGroup()
+{
+	if( app.debug ) console.log( 'newGroup >:' );
+
+	let zones = getValueFromName( 'newZone' ).split( ',' );
+	if( zones.length == 0 ) return;
+	let name = prompt( 'Please enter group name', '' );
+	if( name != '' && name != null ){
+		for( let indx in zones ){
+			let zone = Number( zones[ indx ] ) - 1;
+			if( zone < 0 ) zone = 0;
+			zones[ indx ] = zone;
+		}
+		app.localStorage.saveToStorage( 'groups', name, zones );
+		updateGroupsUI();
 	}
 }
 
