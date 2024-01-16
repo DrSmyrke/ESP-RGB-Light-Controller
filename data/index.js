@@ -4,6 +4,7 @@ var app = {
 	error: false,
 	actionProcess: false,
 	url: undefined,
+	SVGImages: undefined,
 	data: {
 		mode: 0,
 		portsMax: 0,
@@ -58,6 +59,7 @@ var app = {
 //-----------------------------------------------------------------------------
 window.onload = function(){
 	app.localStorage = new Storage( false );
+	app.SVGImages = new SVGImages();
 
 	printLocation();
 	buildControlUI();
@@ -527,14 +529,14 @@ function buildSettingsUI()
 	let sb = document.createElement( 'button' );
 	sb.name = 'action';
 	sb.value = 'save';
-	sb.innerHTML = '<text>Сохранить</text>';
+	sb.innerHTML = '<text>Save</text>';
 	sb.onclick = function(){ changeParam( this ); };
 	buttonBox.appendChild( sb );
 
 	let rb = document.createElement( 'button' );
 	rb.name = 'action';
 	rb.value = 'reboot';
-	rb.innerHTML = '<text>Перезагрузить</text>';
+	rb.innerHTML = '<text>Reboot</text>';
 	rb.onclick = function(){ changeParam( this ); setTimeout(() => document.location.reload(), 3000 ); };
 	buttonBox.appendChild( rb );
 }
@@ -677,7 +679,16 @@ function updateGroupsUI()
 		string.appendChild( text );
 		let div = document.createElement( 'div' );
 		div.className = 'flex';
-		div.innerHTML = '<input type="button" value="R" lang="' + name + '" onClick="removeGroup( this );"> | <input type="color" name="groupColor" lang="' + name + '" onChange="setGroupColor( this );">';
+
+		let removeIco = app.SVGImages.getSvgFromImageName( 'trash' );
+		removeIco.classList.add( 'button' );
+		removeIco.classList.add( 'ico' );
+		removeIco.classList.add( 'nobg' );
+		removeIco.lang = name;
+		removeIco.onclick = function(){ removeGroup( this ); };
+		div.appendChild( removeIco );
+
+		div.innerHTML += ' | <input type="color" name="groupColor" lang="' + name + '" onChange="setGroupColor( this );">';
 		string.appendChild( div );
 		gb.appendChild( string );
 	}

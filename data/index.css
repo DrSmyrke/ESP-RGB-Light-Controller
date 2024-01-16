@@ -1,5 +1,8 @@
 *,*:before,*:after { transition: .25s ease-in-out; }
 :root{
+	--master-color: #d98e18;
+	--second-color: #a47e15;
+
 	--footer-header-zValue: 9;
 }
 body{
@@ -54,6 +57,7 @@ button, .button{
 	outline: none;
 	border: none;
 	align-items: center;
+	cursor: pointer;
 }
 button .content, .button .content, button text, .button text{ margin: 8px 12px; }
 footer button text, footer .button text{ margin: 2px 8px; }
