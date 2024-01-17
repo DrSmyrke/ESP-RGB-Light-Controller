@@ -78,6 +78,8 @@ window.onload = function(){
 
 	// updateData( function(){ app.url = undefined; openPage( document.location.pathname ); } );
 	updateMemory();
+
+	app.SVGImages.replaceAll();
 };
 
 
@@ -516,29 +518,8 @@ function buildSettingsUI()
 		return undefined;
 	}
 
-
 	rebuildInputsOutsSettings();
-
 	rebuildZonesSettings();
-
-
-	let buttonBox = document.createElement( 'div' );
-	buttonBox.classList.add( 'flex' );
-	obj.appendChild( buttonBox );
-
-	let sb = document.createElement( 'button' );
-	sb.name = 'action';
-	sb.value = 'save';
-	sb.innerHTML = '<text>Save</text>';
-	sb.onclick = function(){ changeParam( this ); };
-	buttonBox.appendChild( sb );
-
-	let rb = document.createElement( 'button' );
-	rb.name = 'action';
-	rb.value = 'reboot';
-	rb.innerHTML = '<text>Reboot</text>';
-	rb.onclick = function(){ changeParam( this ); setTimeout(() => document.location.reload(), 3000 ); };
-	buttonBox.appendChild( rb );
 }
 
 //-----------------------------------------------------------------------------
