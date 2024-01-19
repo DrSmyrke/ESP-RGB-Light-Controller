@@ -180,11 +180,11 @@ function wsOnMessage( event )
 
 			app.data.zones								= {};
 			for( let i = 0; i < app.data.zonesCount; i++ ){
-				let port								= view.getUint8( offset++ );
-				let start								= ( ( view.getUint8( offset++ ) << 8 ) | ( view.getUint8( offset++ ) ) );
-				let count								= ( ( view.getUint8( offset++ ) << 8 ) | ( view.getUint8( offset++ ) ) );
+				let port								= view.getUint8( offset++ ); offset++;
+				let start								= ( ( view.getUint8( offset + 1 ) << 8 ) | ( view.getUint8( offset ) ) ); offset += 2;
+				let count								= ( ( view.getUint8( offset + 1 ) << 8 ) | ( view.getUint8( offset ) ) ); offset += 2;
 				app.data.zones[ i ] = { port: port, start: start, count: count };
-				offset++;
+				// offset++;
 			}
 
 			// Effects

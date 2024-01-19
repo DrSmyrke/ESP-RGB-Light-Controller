@@ -82,7 +82,9 @@ void rainbow(void)
 				while( j ){
 					CRGB color_cur = port[ j ];
 					CRGB color_prew = port[ j - 1 ];
-					if( color_prew.r == 0 && color_prew.g == 0 && color_prew.b == 0 ) color_prew = getNexLedRianbow( color_cur, topValue );
+					if( color_cur.r != 0 || color_cur.g != 0 || color_cur.b != 0 ){
+						if( color_prew.r == 0 && color_prew.g == 0 && color_prew.b == 0 ) color_prew = getNexLedRianbow( color_cur, topValue );
+					}
 					port[ j ] = color_prew;
 					port[ j - 1 ] = getNexLedRianbow( color_cur, topValue );
 					j--;
