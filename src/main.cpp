@@ -5,7 +5,7 @@ AppData app;
 ESP8266WebServer webServer( 80 );
 WebSocketsServer webSocket( 81 );
 Timer timer0( 0, 1000, [](void*){ app.flags.timer0 = 1; } );
-Timer timer1( 0, 1, [](void*){ app.flags.timer1 = 1; } );
+Timer timer1( 0, 35, [](void*){ app.flags.timer1 = 1; } );
 
 // CRGB leds2[ LENTA2_COUNT ];
 // Adafruit_NeoPixel port1( LENTA1_COUNT, LENTA2_PIN, NEO_GRB + NEO_KHZ800 );

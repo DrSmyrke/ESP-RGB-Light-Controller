@@ -91,7 +91,6 @@ void animationProcess(void)
 	}
 
 	if( app.orderNum >= LENTS_COUNT_MAX ) app.orderNum = 0;
-	m_animationCounterMax = 80;
 
 	switch( app.param.mode ){
 		case 0:

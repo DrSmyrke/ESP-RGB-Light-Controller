@@ -76,7 +76,6 @@ window.onload = function(){
 	setValueFromName( 'tPort', ( data.hasOwnProperty( 'tPort' ) ) ? data.tPort : 81 );
 	wsConnect();
 
-	// updateData( function(){ app.url = undefined; openPage( document.location.pathname ); } );
 	updateMemory();
 
 	app.SVGImages.replaceAll();
@@ -832,67 +831,6 @@ function updateMemory()
 	// Command for get free memory
 	binary[ 0 ] = 0xF3;
 	app.ws.send( binary.buffer );
-}
-
-//-----------------------------------------------------------------------------
-function updateData( callback = undefined )
-{
-	var request = makeHttpObject();
-	request.open( 'GET', '/get', true );
-	request.send( null );
-
-	request.onreadystatechange = function(){
-		if( request.readyState == 4 ){
-			if( request.status == 200 ){
-				if( app.debug ) console.log( 'updateData >:', request.responseText );
-				let dataObject = JSON.parse( ( request.responseText != '' ) ? request.responseText : '{}' );
-
-				if( dataObject.hasOwnProperty( 'mode' ) ) app.data.mode = dataObject.mode;
-				if( dataObject.hasOwnProperty( 'ports' ) ) app.data.ports = dataObject.ports;
-				if( dataObject.hasOwnProperty( 'outs' ) ) app.data.outs = dataObject.outs;
-				if( dataObject.hasOwnProperty( 'zones' ) ) app.data.zones.count = dataObject.zones;
-				if( dataObject.hasOwnProperty( 'masterColor' ) ) app.data.masterColor = dataObject.masterColor;
-
-				if( callback != undefined ) callback();
-
-
-				// setTimeout( updateData, 5000 );
-			}else{
-				app.error = true;
-				if( callback != undefined ) callback();
-			}
-		}else{
-			app.error = true;
-			if( callback != undefined ) callback();
-		}
-	};
-}
-
-//-----------------------------------------------------------------------------
-function addHeader( obj = undefined, title = '' )
-{
-	if( obj == undefined ) return;
-
-	let header = document.createElement( 'div' );
-	header.classList = 'header';
-	header.innerHTML = title;
-	obj.appendChild( header );
-}
-
-//-----------------------------------------------------------------------------
-function addString( obj = undefined, title = '', controlObject )
-{
-	if( obj == undefined ) return;
-
-	let titleBox = document.createElement( 'text' );
-	titleBox.innerText = title;
-
-	let modeString = document.createElement( 'div' );
-	modeString.classList = 'string';
-	modeString.appendChild( titleBox );
-	modeString.appendChild( controlObject );
-
-	obj.appendChild( modeString );
 }
 
 //-----------------------------------------------------------------------------

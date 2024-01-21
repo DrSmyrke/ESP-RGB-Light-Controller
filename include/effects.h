@@ -9,7 +9,7 @@
 
 //----------- DEFINES ---------------------------------------------------------------------
 #ifndef EFFECT_RAINBOW_ANIM_DELAY
-	#define EFFECT_RAINBOW_ANIM_DELAY									4
+	#define EFFECT_RAINBOW_ANIM_DELAY									0
 #endif
 #ifndef EFFECT_RAINBOW_SPEED
 	#define EFFECT_RAINBOW_SPEED										12
@@ -19,7 +19,7 @@
 #endif
 
 #ifndef EFFECT_FIRE_ANIM_DELAY
-	#define EFFECT_FIRE_ANIM_DELAY										4
+	#define EFFECT_FIRE_ANIM_DELAY										0
 #endif
 #ifndef EFFECT_FIRE_SPEED
 	#define EFFECT_FIRE_SPEED											1
@@ -47,7 +47,7 @@
 #endif
 
 #ifndef EFFECT_PULSE_ANIM_DELAY
-	#define EFFECT_PULSE_ANIM_DELAY										4
+	#define EFFECT_PULSE_ANIM_DELAY										0
 #endif
 #ifndef EFFECT_PULSE_SPEED
 	#define EFFECT_PULSE_SPEED											4

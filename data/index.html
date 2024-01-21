@@ -359,19 +359,6 @@ input:disabled{ opacity: 0.15; }
 
 		<script>
 		//-----------------------------------------------------------------------------
-		function makeHttpObject()
-		{
-			try {return new XMLHttpRequest();}
-
-			catch (error) {}
-			try {return new ActiveXObject('Msxml2.XMLHTTP');}
-			catch (error) {}
-
-			try {return new ActiveXObject('Microsoft.XMLHTTP');}
-			catch (error) {}
-			throw new Error('Could not create HTTP request object.');
-		}
-		//-----------------------------------------------------------------------------
 		function printLocation()
 		{
 			if( app.debug ) console.info( 'printLocation >:', document.location.href, document.location.pathname );
@@ -417,6 +404,33 @@ input:disabled{ opacity: 0.15; }
 			obj.classList.add( 'hidden' );
 			// Если созданный объект временный удаляем его из памяти
 			if( obj.lang == 't' ) obj.remove();
+		}
+
+		//-----------------------------------------------------------------------------
+		function addHeader( obj = undefined, title = '' )
+		{
+			if( obj == undefined ) return;
+
+			let header = document.createElement( 'div' );
+			header.classList = 'header';
+			header.innerHTML = title;
+			obj.appendChild( header );
+		}
+
+		//-----------------------------------------------------------------------------
+		function addString( obj = undefined, title = '', controlObject )
+		{
+			if( obj == undefined ) return;
+
+			let titleBox = document.createElement( 'text' );
+			titleBox.innerText = title;
+
+			let modeString = document.createElement( 'div' );
+			modeString.classList = 'string';
+			modeString.appendChild( titleBox );
+			modeString.appendChild( controlObject );
+
+			obj.appendChild( modeString );
 		}
 
 		//========================================================================================================
